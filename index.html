@@ -9,34 +9,15 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: Arial, sans-serif;
     background: #0e0e0e;
-    color: #fff;
+    font-family: Arial, sans-serif;
+    color: white;
   }
-
-  header {
-    height: 56px;
-    background: #000;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-
-  header h1 { font-size: 16px; letter-spacing: 2px; }
-  header span { color: #E84525; }
-  .hint { font-size: 12px; color: #999; }
 
   .diagram-wrapper {
-    position: relative;
     width: 100%;
     max-width: 1600px;
-    margin: 24px auto;
-    padding: 0 24px;
+    margin: 0 auto;
   }
 
   .diagram-container {
@@ -47,55 +28,72 @@
   .diagram-container img {
     width: 100%;
     display: block;
-    border-radius: 6px;
   }
 
   .hotspot {
     position: absolute;
+    z-index: 5;
     cursor: pointer;
     border-radius: 4px;
+    background: transparent;
   }
 
   .hotspot:hover {
-    background: rgba(232, 69, 37, 0.12);
-    box-shadow: 0 0 0 2px rgba(232, 69, 37, 0.65);
+    background: rgba(232, 69, 37, 0.14);
+    box-shadow: 0 0 0 2px rgba(232, 69, 37, 0.75);
   }
 
   .hotspot.active {
-    background: rgba(232, 69, 37, 0.20);
+    background: rgba(232, 69, 37, 0.22);
     box-shadow: 0 0 0 2px #E84525;
+  }
+
+  /* Debug yapmak istersen sadece bunu aç */
+  /*
+  .hotspot {
+    background: rgba(255, 0, 0, 0.12);
+    border: 2px solid red;
+  }
+  */
+
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 900;
   }
 
   #popup {
     display: none;
     position: fixed;
+    z-index: 1000;
     width: 360px;
     max-height: 80vh;
     overflow-y: auto;
-    z-index: 999;
     background: #1a1a1a;
-    border: 1px solid rgba(232,69,37,0.45);
+    border: 1px solid rgba(232,69,37,0.5);
     border-radius: 12px;
     box-shadow: 0 20px 60px rgba(0,0,0,0.7);
   }
 
   .popup-header {
     padding: 16px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
     display: flex;
     justify-content: space-between;
     gap: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
 
   .bo-tag {
     display: inline-block;
+    margin-bottom: 8px;
+    padding: 3px 8px;
     color: #E84525;
     background: rgba(232,69,37,0.12);
     border: 1px solid rgba(232,69,37,0.35);
-    padding: 3px 8px;
     border-radius: 4px;
     font-size: 11px;
-    margin-bottom: 8px;
+    font-weight: bold;
   }
 
   .popup-title {
@@ -112,14 +110,14 @@
     cursor: pointer;
   }
 
-  .close-btn:hover { color: #fff; }
-
-  .popup-body { padding: 16px; }
+  .popup-body {
+    padding: 16px;
+  }
 
   .popup-summary {
     color: #ccc;
-    line-height: 1.5;
     font-size: 14px;
+    line-height: 1.5;
     margin-bottom: 16px;
   }
 
@@ -143,7 +141,6 @@
     cursor: pointer;
     display: flex;
     gap: 8px;
-    align-items: center;
   }
 
   .ddp-header:hover {
@@ -160,7 +157,6 @@
   .ddp-name {
     color: #ddd;
     font-size: 13px;
-    flex: 1;
   }
 
   .ddp-detail {
@@ -176,54 +172,44 @@
   .ddp-item.open .ddp-detail {
     display: block;
   }
-
-  #overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 998;
-  }
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>LOGISTICS <span>FLOW</span></h1>
-  <div class="hint">Click any process box to explore</div>
-</header>
-
 <div class="diagram-wrapper">
-  <div class="diagram-container" id="diagramContainer">
+  <div class="diagram-container">
 
     <img src="flow.png" alt="Logistics Flow Diagram" />
 
-    <!-- Interaction Center Lane -->
-    <div class="hotspot" data-id="customer-contact" style="left:25.9%; top:11.3%; width:6.1%; height:9.4%;"></div>
-    <div class="hotspot" data-id="automatic-prepping" style="left:33.6%; top:11.3%; width:6.4%; height:9.4%;"></div>
-    <div class="hotspot" data-id="appointment-scheduled" style="left:41.0%; top:11.3%; width:6.2%; height:9.4%;"></div>
-    <div class="hotspot" data-id="atp-check-ic" style="left:45.6%; top:7.8%; width:6.2%; height:3.0%;"></div>
+    <!-- Interaction Center -->
+    <div class="hotspot" data-id="start" style="left:15.6%; top:13.2%; width:5.8%; height:5.2%;"></div>
+    <div class="hotspot" data-id="customer-contact" style="left:25.1%; top:10.7%; width:6.0%; height:8.8%;"></div>
+    <div class="hotspot" data-id="automatic-prepping" style="left:32.0%; top:10.7%; width:6.1%; height:8.8%;"></div>
+    <div class="hotspot" data-id="appointment-scheduled" style="left:38.7%; top:10.7%; width:6.2%; height:8.8%;"></div>
+    <div class="hotspot" data-id="atp-check-ic" style="left:43.3%; top:7.1%; width:6.1%; height:4.3%;"></div>
 
-    <!-- Back Office Lane -->
-    <div class="hotspot" data-id="manual-prepping" style="left:41.0%; top:25.9%; width:6.2%; height:9.4%;"></div>
-    <div class="hotspot" data-id="atp-check-bo" style="left:45.8%; top:25.0%; width:6.2%; height:3.1%;"></div>
-    <div class="hotspot" data-id="sps" style="left:53.4%; top:25.9%; width:6.2%; height:9.4%;"></div>
-    <div class="hotspot" data-id="escalation-bo" style="left:58.2%; top:25.1%; width:6.2%; height:3.0%;"></div>
-    <div class="hotspot" data-id="appointment-rescheduling" style="left:70.8%; top:26.0%; width:6.2%; height:9.3%;"></div>
-    <div class="hotspot" data-id="follow-up-appointment" style="left:70.8%; top:40.0%; width:6.2%; height:9.2%;"></div>
+    <!-- Back Office -->
+    <div class="hotspot" data-id="manual-prepping" style="left:38.7%; top:24.5%; width:6.2%; height:8.8%;"></div>
+    <div class="hotspot" data-id="atp-check-bo" style="left:43.1%; top:24.2%; width:6.2%; height:4.0%;"></div>
+    <div class="hotspot" data-id="sps" style="left:50.2%; top:24.5%; width:6.3%; height:8.8%;"></div>
+    <div class="hotspot" data-id="escalation-bo" style="left:54.7%; top:24.0%; width:6.3%; height:4.1%;"></div>
+    <div class="hotspot" data-id="appointment-rescheduling" style="left:66.0%; top:24.5%; width:6.5%; height:8.8%;"></div>
+    <div class="hotspot" data-id="follow-up-appointment" style="left:66.0%; top:39.0%; width:6.5%; height:8.8%;"></div>
 
-    <!-- Logistics Lane -->
-    <div class="hotspot" data-id="spare-part-delivery" style="left:53.4%; top:54.0%; width:6.2%; height:9.0%;"></div>
-    <div class="hotspot" data-id="escalation-logistics" style="left:58.2%; top:52.4%; width:6.2%; height:4.1%;"></div>
+    <!-- Logistics -->
+    <div class="hotspot" data-id="spare-part-delivery" style="left:50.2%; top:52.8%; width:6.3%; height:8.7%;"></div>
+    <div class="hotspot" data-id="escalation-logistics" style="left:54.7%; top:51.5%; width:6.3%; height:4.1%;"></div>
 
-    <!-- Technician Lane -->
-    <div class="hotspot" data-id="parts-delivered" style="left:53.4%; top:71.3%; width:6.2%; height:9.5%;"></div>
-    <div class="hotspot" data-id="part-missing" style="left:70.7%; top:71.3%; width:6.2%; height:9.5%;"></div>
-    <div class="hotspot" data-id="customer-visit" style="left:53.4%; top:84.2%; width:6.2%; height:9.5%;"></div>
-    <div class="hotspot" data-id="repair" style="left:62.1%; top:84.2%; width:6.1%; height:9.5%;"></div>
-    <div class="hotspot" data-id="consumption" style="left:70.7%; top:84.2%; width:6.2%; height:9.5%;"></div>
-    <div class="hotspot" data-id="unused-return" style="left:84.4%; top:78.0%; width:6.1%; height:5.0%;"></div>
-    <div class="hotspot" data-id="send-back-factory" style="left:84.4%; top:90.0%; width:6.1%; height:4.5%;"></div>
+    <!-- Technician -->
+    <div class="hotspot" data-id="parts-delivered" style="left:50.2%; top:69.7%; width:6.3%; height:8.8%;"></div>
+    <div class="hotspot" data-id="customer-visit" style="left:50.2%; top:82.0%; width:6.3%; height:8.8%;"></div>
+    <div class="hotspot" data-id="repair" style="left:58.2%; top:82.0%; width:6.4%; height:8.8%;"></div>
+    <div class="hotspot" data-id="consumption" style="left:66.0%; top:82.0%; width:6.5%; height:8.8%;"></div>
+    <div class="hotspot" data-id="part-missing" style="left:66.0%; top:69.7%; width:6.5%; height:8.8%;"></div>
+    <div class="hotspot" data-id="unused-return" style="left:78.5%; top:76.0%; width:6.5%; height:8.8%;"></div>
+    <div class="hotspot" data-id="send-back-factory" style="left:78.5%; top:88.0%; width:6.5%; height:8.8%;"></div>
+    <div class="hotspot" data-id="end" style="left:91.0%; top:82.4%; width:5.8%; height:5.4%;"></div>
 
   </div>
 </div>
@@ -248,30 +234,25 @@
 
 <script>
 const flowData = {
+  "start": {
+    bo: "START",
+    title: "Start",
+    summary: "Process starts here.",
+    ddps: []
+  },
+
   "customer-contact": {
     bo: "BO CODE HERE",
     title: "Customer Contact",
     summary: "Write short summary here.",
-    ddps: [
-      {
-        code: "DDP-XXXXX",
-        name: "DDP name here",
-        detail: "What it does and why it matters."
-      }
-    ]
+    ddps: []
   },
 
   "automatic-prepping": {
     bo: "BO CODE HERE",
     title: "Automatic Preprepping",
     summary: "Write short summary here.",
-    ddps: [
-      {
-        code: "DDP-XXXXX",
-        name: "DDP name here",
-        detail: "What it does and why it matters."
-      }
-    ]
+    ddps: []
   },
 
   "appointment-scheduled": {
@@ -283,7 +264,7 @@ const flowData = {
 
   "atp-check-ic": {
     bo: "BO CODE HERE",
-    title: "ATP Check - Interaction Center",
+    title: "ATP Check",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -294,35 +275,30 @@ const flowData = {
     summary: "Write short summary here.",
     ddps: [
       {
-        code: "DDP-58673",
-        name: "Prepping categorizations and status",
-        detail: "Update this text with your own explanation."
-      },
-      {
-        code: "DDP-58674",
+        code: "DDP-XXXXX",
         name: "DDP name here",
-        detail: "Update this text with your own explanation."
+        detail: "What it does and why it matters."
       }
     ]
   },
 
   "atp-check-bo": {
     bo: "BO CODE HERE",
-    title: "ATP Check - Back Office",
+    title: "ATP Check",
     summary: "Write short summary here.",
     ddps: []
   },
 
   "sps": {
     bo: "BO CODE HERE",
-    title: "SPS",
+    title: "SPS - Spare Part Reservation",
     summary: "Write short summary here.",
     ddps: []
   },
 
   "escalation-bo": {
     bo: "BO CODE HERE",
-    title: "Escalation - Back Office",
+    title: "Escalation",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -350,7 +326,7 @@ const flowData = {
 
   "escalation-logistics": {
     bo: "BO CODE HERE",
-    title: "Escalation - Logistics",
+    title: "Escalation",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -358,13 +334,6 @@ const flowData = {
   "parts-delivered": {
     bo: "BO CODE HERE",
     title: "Parts Delivered",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "part-missing": {
-    bo: "BO CODE HERE",
-    title: "Part Missing",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -390,6 +359,13 @@ const flowData = {
     ddps: []
   },
 
+  "part-missing": {
+    bo: "BO CODE HERE",
+    title: "Part Missing",
+    summary: "Write short summary here.",
+    ddps: []
+  },
+
   "unused-return": {
     bo: "BO CODE HERE",
     title: "Unused Return",
@@ -401,6 +377,13 @@ const flowData = {
     bo: "BO CODE HERE",
     title: "Send Back to Factory",
     summary: "Write short summary here.",
+    ddps: []
+  },
+
+  "end": {
+    bo: "END",
+    title: "End",
+    summary: "Process ends here.",
     ddps: []
   }
 };
@@ -418,10 +401,7 @@ document.querySelectorAll(".hotspot").forEach(hotspot => {
     const id = hotspot.dataset.id;
     const data = flowData[id];
 
-    if (!data) {
-      alert("No data found for: " + id);
-      return;
-    }
+    if (!data) return;
 
     if (activeHotspot) {
       activeHotspot.classList.remove("active");
@@ -439,15 +419,15 @@ document.querySelectorAll(".hotspot").forEach(hotspot => {
 });
 
 function renderPopup(data) {
-  document.getElementById("popupBO").textContent = data.bo || "";
-  document.getElementById("popupTitle").textContent = data.title || "";
-  document.getElementById("popupSummary").textContent = data.summary || "";
+  document.getElementById("popupBO").textContent = data.bo;
+  document.getElementById("popupTitle").textContent = data.title;
+  document.getElementById("popupSummary").textContent = data.summary;
 
   const ddpList = document.getElementById("ddpList");
   ddpList.innerHTML = "";
 
   if (!data.ddps || data.ddps.length === 0) {
-    ddpList.innerHTML = `<div style="color:#777; font-size:13px;">No DDP added yet.</div>`;
+    ddpList.innerHTML = `<div style="font-size:13px;color:#777;">No DDP added yet.</div>`;
     return;
   }
 
@@ -510,12 +490,6 @@ overlay.addEventListener("click", closePopup);
 
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closePopup();
-});
-
-window.addEventListener("resize", () => {
-  if (activeHotspot) {
-    positionPopup(activeHotspot);
-  }
 });
 </script>
 
