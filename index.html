@@ -113,39 +113,11 @@
 
 <script>
 const flowData = {
-  "customer-contact": {
-    bo: "BO-01", title: "Customer Contact",
-    summary: "The process begins when a customer reaches out via the Interaction Center. The agent logs the request, validates customer identity, and creates a service order to kick off the workflow.",
-    ddps: [
-      { code: "DDP-001", name: "Channel Identification", detail: "Determines which inbound channel (phone, email, portal) the customer used. Affects routing rules and SLA timestamps." },
-      { code: "DDP-002", name: "Customer Validation", detail: "Verifies the customer account and entitlement before creating a work order, preventing unauthorised service requests." },
-      { code: "DDP-003", name: "Symptom Capture", detail: "Records the reported fault or symptom against the asset, feeding directly into the automated prepping algorithm to identify likely spare parts." }
-    ]
-  },
-  "automatic-prepping": {
-    bo: "BO-01", title: "Automatic Prepping",
-    summary: "The system automatically analyses the reported symptom and historical repair data to predict which spare parts will be needed, then triggers an ATP availability check before scheduling.",
-    ddps: [
-      { code: "DDP-004", name: "Predictive Parts Engine", detail: "Uses ML-based fault-to-part mapping to recommend the top 3 likely parts. Accuracy above 80% reduces field revisit rate." },
-      { code: "DDP-005", name: "ATP Trigger Condition", detail: "If ATP confirms part availability, scheduling proceeds automatically. If not, the flow escalates to Manual Prepping in Back Office." },
-      { code: "DDP-006", name: "Prepping Audit Trail", detail: "Every auto-prep decision is logged with confidence score and part IDs for quality review and model retraining." }
-    ]
-  },
-  "appointment-scheduled": {
-    bo: "BO-01", title: "Appointment Scheduled",
-    summary: "Once parts are confirmed available, the system books a technician slot and sends the customer a confirmation. The appointment is locked to the committed ATP window.",
-    ddps: [
-      { code: "DDP-007", name: "Slot Optimisation Rule", detail: "Assigns the nearest available technician using geography and skill matching. Reduces average travel time and improves first-time fix rate." },
-      { code: "DDP-008", name: "Customer Notification", detail: "Automated confirmation sent via the customer's preferred channel. Includes date, window, and technician contact." },
-      { code: "DDP-009", name: "Appointment Lock Policy", detail: "The appointment cannot be changed without Back Office authorisation once the spare part has entered the logistics pipeline." }
-    ]
-  },
   "atp-check-ic": {
-    bo: "BO-01", title: "ATP Check (Interaction Center)",
-    summary: "Available-to-Promise check run at the Interaction Center level. Confirms that all predicted spare parts are in stock and can be committed to the appointment date.",
+    bo: "DDP-60449", title: "[BO] 3.1 Work Management / 3.1.2 AutoPreprepping",
+    summary: "Available-to-Promise check",
     ddps: [
-      { code: "DDP-010", name: "ATP Threshold", detail: "A part is considered available only if stock is above the safety stock level. Below threshold, the check fails and flows to Manual Prepping." },
-      { code: "DDP-011", name: "Multi-Warehouse Scope", detail: "The check spans all regional warehouses, not just the local one, to maximise availability confirmation rate." }
+      { code: "DDP-58676", name: " PAR_FS: Provide spare part availability in warehouse", detail: "As a Prepper, Backoffice user, Technician I want to see real-time spare part availability information (traffic light indicator, stock quantity, ETA, and material blockage status) in the Work Order Products area so that I can make informed decisions on prepping, replacing, or escalating spare parts without causing unnecessary delays to the appointment." }
     ]
   },
   "manual-prepping": {
