@@ -3,213 +3,266 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Logistics Flow</title>
+<title>Paramount Logistics Flow</title>
 
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
-  body {
-    background: #0e0e0e;
-    font-family: Arial, sans-serif;
-    color: white;
-  }
+body {
+  background: #0e0e0e;
+  color: #fff;
+  font-family: Arial, sans-serif;
+}
 
-  .diagram-wrapper {
-    width: 100%;
-    max-width: 1600px;
-    margin: 0 auto;
-  }
+header {
+  height: 56px;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-  .diagram-container {
-    position: relative;
-    width: 100%;
-  }
+header h1 {
+  font-size: 16px;
+  letter-spacing: 2px;
+}
 
-  .diagram-container img {
-    width: 100%;
-    display: block;
-  }
+header span {
+  color: #E84525;
+}
 
-  .hotspot {
-    position: absolute;
-    z-index: 5;
-    cursor: pointer;
-    border-radius: 4px;
-    background: transparent;
-  }
+.hint {
+  font-size: 12px;
+  color: #999;
+}
 
-  .hotspot:hover {
-    background: rgba(232, 69, 37, 0.14);
-    box-shadow: 0 0 0 2px rgba(232, 69, 37, 0.75);
-  }
+.diagram-wrapper {
+  width: 100%;
+  max-width: 1600px;
+  margin: 24px auto;
+  padding: 0 24px;
+}
 
-  .hotspot.active {
-    background: rgba(232, 69, 37, 0.22);
-    box-shadow: 0 0 0 2px #E84525;
-  }
+.diagram-container {
+  position: relative;
+  width: 100%;
+}
 
-  /* Debug yapmak istersen sadece bunu aç */
-  /*
-  .hotspot {
-    background: rgba(255, 0, 0, 0.12);
-    border: 2px solid red;
-  }
-  */
+.diagram-container img {
+  width: 100%;
+  display: block;
+  border-radius: 6px;
+}
 
-  #overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 900;
-  }
+/* PIN SYSTEM */
+.pin {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #E84525;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 4px rgba(232,69,37,0.18);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
 
-  #popup {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    width: 360px;
-    max-height: 80vh;
-    overflow-y: auto;
-    background: #1a1a1a;
-    border: 1px solid rgba(232,69,37,0.5);
-    border-radius: 12px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-  }
+.pin::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
 
-  .popup-header {
-    padding: 16px;
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
+.pin:hover {
+  transform: translate(-50%, -50%) scale(1.35);
+  box-shadow: 0 0 0 8px rgba(232,69,37,0.22);
+}
 
-  .bo-tag {
-    display: inline-block;
-    margin-bottom: 8px;
-    padding: 3px 8px;
-    color: #E84525;
-    background: rgba(232,69,37,0.12);
-    border: 1px solid rgba(232,69,37,0.35);
-    border-radius: 4px;
-    font-size: 11px;
-    font-weight: bold;
-  }
+.pin.active {
+  transform: translate(-50%, -50%) scale(1.45);
+  box-shadow: 0 0 0 9px rgba(232,69,37,0.28);
+}
 
-  .popup-title {
-    font-size: 17px;
-    font-weight: bold;
-    line-height: 1.3;
-  }
+/* POPUP */
+#popup {
+  display: none;
+  position: fixed;
+  width: 360px;
+  max-height: 80vh;
+  overflow-y: auto;
+  z-index: 999;
+  background: #1a1a1a;
+  border: 1px solid rgba(232,69,37,0.45);
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+}
 
-  .close-btn {
-    background: none;
-    border: none;
-    color: #aaa;
-    font-size: 22px;
-    cursor: pointer;
-  }
+.popup-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
 
-  .popup-body {
-    padding: 16px;
-  }
+.bo-tag {
+  display: inline-block;
+  color: #E84525;
+  background: rgba(232,69,37,0.12);
+  border: 1px solid rgba(232,69,37,0.35);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  margin-bottom: 8px;
+  font-weight: bold;
+}
 
-  .popup-summary {
-    color: #ccc;
-    font-size: 14px;
-    line-height: 1.5;
-    margin-bottom: 16px;
-  }
+.popup-title {
+  font-size: 17px;
+  font-weight: bold;
+  line-height: 1.3;
+}
 
-  .ddp-label {
-    font-size: 11px;
-    color: #888;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-  }
+.close-btn {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 22px;
+  cursor: pointer;
+}
 
-  .ddp-item {
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 8px;
-    margin-bottom: 8px;
-    overflow: hidden;
-  }
+.close-btn:hover {
+  color: #fff;
+}
 
-  .ddp-header {
-    padding: 10px;
-    cursor: pointer;
-    display: flex;
-    gap: 8px;
-  }
+.popup-body {
+  padding: 16px;
+}
 
-  .ddp-header:hover {
-    background: rgba(255,255,255,0.04);
-  }
+.popup-summary {
+  color: #ccc;
+  line-height: 1.5;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
 
-  .ddp-code {
-    color: #E84525;
-    font-weight: bold;
-    font-size: 12px;
-    white-space: nowrap;
-  }
+.ddp-label {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
 
-  .ddp-name {
-    color: #ddd;
-    font-size: 13px;
-  }
+.ddp-item {
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
 
-  .ddp-detail {
-    display: none;
-    padding: 10px;
-    border-top: 1px solid rgba(255,255,255,0.08);
-    color: #aaa;
-    font-size: 13px;
-    line-height: 1.5;
-    background: rgba(0,0,0,0.25);
-  }
+.ddp-header {
+  padding: 10px;
+  cursor: pointer;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
 
-  .ddp-item.open .ddp-detail {
-    display: block;
-  }
+.ddp-header:hover {
+  background: rgba(255,255,255,0.04);
+}
+
+.ddp-code {
+  color: #E84525;
+  font-weight: bold;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.ddp-name {
+  color: #ddd;
+  font-size: 13px;
+  flex: 1;
+}
+
+.ddp-detail {
+  display: none;
+  padding: 10px;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  color: #aaa;
+  font-size: 13px;
+  line-height: 1.5;
+  background: rgba(0,0,0,0.25);
+}
+
+.ddp-item.open .ddp-detail {
+  display: block;
+}
+
+#overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 998;
+}
 </style>
 </head>
 
 <body>
 
+<header>
+  <h1>LOGISTICS <span>FLOW</span></h1>
+  <div class="hint">Click red pins to explore</div>
+</header>
+
 <div class="diagram-wrapper">
   <div class="diagram-container">
 
-    <img src="flow.png" alt="Logistics Flow Diagram" />
+    <img src="flow.png" alt="Paramount Logistics Flow" />
 
-    <!-- Interaction Center -->
-    <div class="hotspot" data-id="start" style="left:15.6%; top:13.2%; width:5.8%; height:5.2%;"></div>
-    <div class="hotspot" data-id="customer-contact" style="left:25.1%; top:10.7%; width:6.0%; height:8.8%;"></div>
-    <div class="hotspot" data-id="automatic-prepping" style="left:32.0%; top:10.7%; width:6.1%; height:8.8%;"></div>
-    <div class="hotspot" data-id="appointment-scheduled" style="left:38.7%; top:10.7%; width:6.2%; height:8.8%;"></div>
-    <div class="hotspot" data-id="atp-check-ic" style="left:43.3%; top:7.1%; width:6.1%; height:4.3%;"></div>
+    <!-- PIN POSITIONS: left/top değerlerini kolayca değiştirebilirsin -->
 
-    <!-- Back Office -->
-    <div class="hotspot" data-id="manual-prepping" style="left:38.7%; top:24.5%; width:6.2%; height:8.8%;"></div>
-    <div class="hotspot" data-id="atp-check-bo" style="left:43.1%; top:24.2%; width:6.2%; height:4.0%;"></div>
-    <div class="hotspot" data-id="sps" style="left:50.2%; top:24.5%; width:6.3%; height:8.8%;"></div>
-    <div class="hotspot" data-id="escalation-bo" style="left:54.7%; top:24.0%; width:6.3%; height:4.1%;"></div>
-    <div class="hotspot" data-id="appointment-rescheduling" style="left:66.0%; top:24.5%; width:6.5%; height:8.8%;"></div>
-    <div class="hotspot" data-id="follow-up-appointment" style="left:66.0%; top:39.0%; width:6.5%; height:8.8%;"></div>
+    <button class="pin" data-id="start" style="left:18.5%; top:15.8%;" title="Start"></button>
 
-    <!-- Logistics -->
-    <div class="hotspot" data-id="spare-part-delivery" style="left:50.2%; top:52.8%; width:6.3%; height:8.7%;"></div>
-    <div class="hotspot" data-id="escalation-logistics" style="left:54.7%; top:51.5%; width:6.3%; height:4.1%;"></div>
+    <button class="pin" data-id="customer-contact" style="left:28.2%; top:15.3%;" title="Customer Contact"></button>
+    <button class="pin" data-id="automatic-prepping" style="left:35.4%; top:15.3%;" title="Automatic Preprepping"></button>
+    <button class="pin" data-id="appointment-scheduled" style="left:42.0%; top:15.3%;" title="Appointment Scheduled"></button>
+    <button class="pin" data-id="atp-check-ic" style="left:46.5%; top:9.4%;" title="ATP Check"></button>
 
-    <!-- Technician -->
-    <div class="hotspot" data-id="parts-delivered" style="left:50.2%; top:69.7%; width:6.3%; height:8.8%;"></div>
-    <div class="hotspot" data-id="customer-visit" style="left:50.2%; top:82.0%; width:6.3%; height:8.8%;"></div>
-    <div class="hotspot" data-id="repair" style="left:58.2%; top:82.0%; width:6.4%; height:8.8%;"></div>
-    <div class="hotspot" data-id="consumption" style="left:66.0%; top:82.0%; width:6.5%; height:8.8%;"></div>
-    <div class="hotspot" data-id="part-missing" style="left:66.0%; top:69.7%; width:6.5%; height:8.8%;"></div>
-    <div class="hotspot" data-id="unused-return" style="left:78.5%; top:76.0%; width:6.5%; height:8.8%;"></div>
-    <div class="hotspot" data-id="send-back-factory" style="left:78.5%; top:88.0%; width:6.5%; height:8.8%;"></div>
-    <div class="hotspot" data-id="end" style="left:91.0%; top:82.4%; width:5.8%; height:5.4%;"></div>
+    <button class="pin" data-id="manual-prepping" style="left:42.0%; top:29.0%;" title="Manual Prepping"></button>
+    <button class="pin" data-id="atp-check-bo" style="left:46.5%; top:26.2%;" title="ATP Check"></button>
+    <button class="pin" data-id="sps" style="left:53.5%; top:29.0%;" title="SPS"></button>
+    <button class="pin" data-id="escalation-bo" style="left:58.3%; top:26.2%;" title="Escalation"></button>
+    <button class="pin" data-id="appointment-rescheduling" style="left:69.5%; top:29.0%;" title="Appointment Rescheduling Required"></button>
+    <button class="pin" data-id="follow-up-appointment" style="left:69.5%; top:43.5%;" title="Follow-Up Appointment Scheduled"></button>
+
+    <button class="pin" data-id="spare-part-delivery" style="left:53.5%; top:57.0%;" title="Spare Part Delivery"></button>
+    <button class="pin" data-id="escalation-logistics" style="left:58.3%; top:54.2%;" title="Escalation"></button>
+
+    <button class="pin" data-id="parts-delivered" style="left:53.5%; top:74.5%;" title="Parts Delivered"></button>
+    <button class="pin" data-id="part-missing" style="left:69.5%; top:74.5%;" title="Part Missing"></button>
+
+    <button class="pin" data-id="customer-visit" style="left:53.5%; top:86.8%;" title="Customer Visit"></button>
+    <button class="pin" data-id="repair" style="left:61.5%; top:86.8%;" title="Repair"></button>
+    <button class="pin" data-id="consumption" style="left:69.5%; top:86.8%;" title="Consumption"></button>
+
+    <button class="pin" data-id="unused-return" style="left:82.0%; top:80.0%;" title="Unused Return"></button>
+    <button class="pin" data-id="send-back-factory" style="left:82.0%; top:92.0%;" title="Send Back to Factory"></button>
+
+    <button class="pin" data-id="end" style="left:94.0%; top:86.8%;" title="End"></button>
 
   </div>
 </div>
@@ -264,7 +317,7 @@ const flowData = {
 
   "atp-check-ic": {
     bo: "BO CODE HERE",
-    title: "ATP Check",
+    title: "ATP Check - Interaction Center",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -284,7 +337,7 @@ const flowData = {
 
   "atp-check-bo": {
     bo: "BO CODE HERE",
-    title: "ATP Check",
+    title: "ATP Check - Back Office",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -298,7 +351,7 @@ const flowData = {
 
   "escalation-bo": {
     bo: "BO CODE HERE",
-    title: "Escalation",
+    title: "Escalation - Back Office",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -326,7 +379,7 @@ const flowData = {
 
   "escalation-logistics": {
     bo: "BO CODE HERE",
-    title: "Escalation",
+    title: "Escalation - Logistics",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -334,6 +387,13 @@ const flowData = {
   "parts-delivered": {
     bo: "BO CODE HERE",
     title: "Parts Delivered",
+    summary: "Write short summary here.",
+    ddps: []
+  },
+
+  "part-missing": {
+    bo: "BO CODE HERE",
+    title: "Part Missing",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -355,13 +415,6 @@ const flowData = {
   "consumption": {
     bo: "BO CODE HERE",
     title: "Consumption",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "part-missing": {
-    bo: "BO CODE HERE",
-    title: "Part Missing",
     summary: "Write short summary here.",
     ddps: []
   },
@@ -388,30 +441,30 @@ const flowData = {
   }
 };
 
-let activeHotspot = null;
+let activePin = null;
 
 const popup = document.getElementById("popup");
 const overlay = document.getElementById("overlay");
 const closeBtn = document.getElementById("closeBtn");
 
-document.querySelectorAll(".hotspot").forEach(hotspot => {
-  hotspot.addEventListener("click", e => {
+document.querySelectorAll(".pin").forEach(pin => {
+  pin.addEventListener("click", e => {
     e.stopPropagation();
 
-    const id = hotspot.dataset.id;
+    const id = pin.dataset.id;
     const data = flowData[id];
 
     if (!data) return;
 
-    if (activeHotspot) {
-      activeHotspot.classList.remove("active");
+    if (activePin) {
+      activePin.classList.remove("active");
     }
 
-    activeHotspot = hotspot;
-    hotspot.classList.add("active");
+    activePin = pin;
+    pin.classList.add("active");
 
     renderPopup(data);
-    positionPopup(hotspot);
+    positionPopup(pin);
 
     popup.style.display = "block";
     overlay.style.display = "block";
@@ -419,15 +472,15 @@ document.querySelectorAll(".hotspot").forEach(hotspot => {
 });
 
 function renderPopup(data) {
-  document.getElementById("popupBO").textContent = data.bo;
-  document.getElementById("popupTitle").textContent = data.title;
-  document.getElementById("popupSummary").textContent = data.summary;
+  document.getElementById("popupBO").textContent = data.bo || "";
+  document.getElementById("popupTitle").textContent = data.title || "";
+  document.getElementById("popupSummary").textContent = data.summary || "";
 
   const ddpList = document.getElementById("ddpList");
   ddpList.innerHTML = "";
 
   if (!data.ddps || data.ddps.length === 0) {
-    ddpList.innerHTML = `<div style="font-size:13px;color:#777;">No DDP added yet.</div>`;
+    ddpList.innerHTML = `<div style="color:#777; font-size:13px;">No DDP added yet.</div>`;
     return;
   }
 
@@ -451,17 +504,17 @@ function renderPopup(data) {
   });
 }
 
-function positionPopup(hotspot) {
-  const rect = hotspot.getBoundingClientRect();
+function positionPopup(pin) {
+  const rect = pin.getBoundingClientRect();
 
   const popupWidth = 360;
   const popupHeight = 420;
 
-  let left = rect.right + 12;
-  let top = rect.top;
+  let left = rect.right + 16;
+  let top = rect.top - 20;
 
   if (left + popupWidth > window.innerWidth) {
-    left = rect.left - popupWidth - 12;
+    left = rect.left - popupWidth - 16;
   }
 
   if (top + popupHeight > window.innerHeight) {
@@ -479,9 +532,9 @@ function closePopup() {
   popup.style.display = "none";
   overlay.style.display = "none";
 
-  if (activeHotspot) {
-    activeHotspot.classList.remove("active");
-    activeHotspot = null;
+  if (activePin) {
+    activePin.classList.remove("active");
+    activePin = null;
   }
 }
 
@@ -490,6 +543,12 @@ overlay.addEventListener("click", closePopup);
 
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closePopup();
+});
+
+window.addEventListener("resize", () => {
+  if (activePin) {
+    positionPopup(activePin);
+  }
 });
 </script>
 
