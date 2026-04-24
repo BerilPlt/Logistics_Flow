@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Paramount Logistics Flow</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Logistics Flow</title>
 
 <style>
 * {
@@ -14,542 +14,161 @@
 
 body {
   background: #0e0e0e;
-  color: #fff;
   font-family: Arial, sans-serif;
+  color: white;
 }
 
-header {
-  height: 56px;
-  background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 24px;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-header h1 {
-  font-size: 16px;
-  letter-spacing: 2px;
-}
-
-header span {
-  color: #E84525;
-}
-
-.hint {
-  font-size: 12px;
-  color: #999;
-}
-
-.diagram-wrapper {
-  width: 100%;
-  max-width: 1600px;
-  margin: 24px auto;
-  padding: 0 24px;
-}
-
-.diagram-container {
+/* IMAGE */
+.container {
   position: relative;
-  width: 100%;
+  max-width: 1500px;
+  margin: 20px auto;
 }
 
-.diagram-container img {
+.container img {
   width: 100%;
   display: block;
-  border-radius: 6px;
 }
 
-/* PIN SYSTEM */
-.pin {
+/* PIN */
+.info-pin {
+  all: unset;
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   background: #E84525;
   border: 2px solid #fff;
   border-radius: 50%;
   cursor: pointer;
-  z-index: 10;
   transform: translate(-50%, -50%);
-  box-shadow: 0 0 0 4px rgba(232,69,37,0.18);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  z-index: 10;
+  box-shadow: 0 0 0 4px rgba(232, 69, 37, 0.2);
 }
 
-.pin::after {
-  content: "";
-  position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-}
-
-.pin:hover {
-  transform: translate(-50%, -50%) scale(1.35);
-  box-shadow: 0 0 0 8px rgba(232,69,37,0.22);
-}
-
-.pin.active {
-  transform: translate(-50%, -50%) scale(1.45);
-  box-shadow: 0 0 0 9px rgba(232,69,37,0.28);
+.info-pin:hover {
+  transform: translate(-50%, -50%) scale(1.5);
 }
 
 /* POPUP */
 #popup {
   display: none;
   position: fixed;
-  width: 360px;
-  max-height: 80vh;
-  overflow-y: auto;
-  z-index: 999;
+  width: 320px;
   background: #1a1a1a;
-  border: 1px solid rgba(232,69,37,0.45);
-  border-radius: 12px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.7);
-}
-
-.popup-header {
+  border: 1px solid #E84525;
+  border-radius: 10px;
   padding: 16px;
-  border-bottom: 1px solid rgba(255,255,255,0.08);
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
+  z-index: 999;
 }
 
-.bo-tag {
-  display: inline-block;
-  color: #E84525;
-  background: rgba(232,69,37,0.12);
-  border: 1px solid rgba(232,69,37,0.35);
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  margin-bottom: 8px;
-  font-weight: bold;
+#popup h3 {
+  margin-bottom: 6px;
 }
 
-.popup-title {
-  font-size: 17px;
-  font-weight: bold;
-  line-height: 1.3;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  color: #aaa;
-  font-size: 22px;
+.ddp {
+  margin-top: 10px;
+  border-top: 1px solid #333;
+  padding-top: 8px;
   cursor: pointer;
-}
-
-.close-btn:hover {
-  color: #fff;
-}
-
-.popup-body {
-  padding: 16px;
-}
-
-.popup-summary {
-  color: #ccc;
-  line-height: 1.5;
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.ddp-label {
-  font-size: 11px;
-  color: #888;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-}
-
-.ddp-item {
-  border: 1px solid rgba(255,255,255,0.08);
-  border-radius: 8px;
-  margin-bottom: 8px;
-  overflow: hidden;
-}
-
-.ddp-header {
-  padding: 10px;
-  cursor: pointer;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-.ddp-header:hover {
-  background: rgba(255,255,255,0.04);
-}
-
-.ddp-code {
-  color: #E84525;
-  font-weight: bold;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.ddp-name {
-  color: #ddd;
-  font-size: 13px;
-  flex: 1;
 }
 
 .ddp-detail {
   display: none;
-  padding: 10px;
-  border-top: 1px solid rgba(255,255,255,0.08);
   color: #aaa;
   font-size: 13px;
-  line-height: 1.5;
-  background: rgba(0,0,0,0.25);
 }
 
-.ddp-item.open .ddp-detail {
+.ddp.open .ddp-detail {
   display: block;
-}
-
-#overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 998;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <h1>LOGISTICS <span>FLOW</span></h1>
-  <div class="hint">Click red pins to explore</div>
-</header>
+<div class="container">
 
-<div class="diagram-wrapper">
-  <div class="diagram-container">
+  <img src="flow.png">
 
-    <img src="flow.png" alt="Paramount Logistics Flow" />
+  <!-- PINLER (sadece left/top değiştir) -->
 
-    <!-- PIN POSITIONS: left/top değerlerini kolayca değiştirebilirsin -->
+  <button class="info-pin" data-id="customer-contact" style="left:28%; top:15%;"></button>
+  <button class="info-pin" data-id="automatic-prepping" style="left:35%; top:15%;"></button>
+  <button class="info-pin" data-id="appointment-scheduled" style="left:42%; top:15%;"></button>
 
-    <button class="pin" data-id="start" style="left:18.5%; top:15.8%;" title="Start"></button>
+  <button class="info-pin" data-id="manual-prepping" style="left:42%; top:30%;"></button>
+  <button class="info-pin" data-id="sps" style="left:53%; top:30%;"></button>
 
-    <button class="pin" data-id="customer-contact" style="left:28.2%; top:15.3%;" title="Customer Contact"></button>
-    <button class="pin" data-id="automatic-prepping" style="left:35.4%; top:15.3%;" title="Automatic Preprepping"></button>
-    <button class="pin" data-id="appointment-scheduled" style="left:42.0%; top:15.3%;" title="Appointment Scheduled"></button>
-    <button class="pin" data-id="atp-check-ic" style="left:46.5%; top:9.4%;" title="ATP Check"></button>
+  <button class="info-pin" data-id="delivery" style="left:53%; top:55%;"></button>
 
-    <button class="pin" data-id="manual-prepping" style="left:42.0%; top:29.0%;" title="Manual Prepping"></button>
-    <button class="pin" data-id="atp-check-bo" style="left:46.5%; top:26.2%;" title="ATP Check"></button>
-    <button class="pin" data-id="sps" style="left:53.5%; top:29.0%;" title="SPS"></button>
-    <button class="pin" data-id="escalation-bo" style="left:58.3%; top:26.2%;" title="Escalation"></button>
-    <button class="pin" data-id="appointment-rescheduling" style="left:69.5%; top:29.0%;" title="Appointment Rescheduling Required"></button>
-    <button class="pin" data-id="follow-up-appointment" style="left:69.5%; top:43.5%;" title="Follow-Up Appointment Scheduled"></button>
+  <button class="info-pin" data-id="repair" style="left:60%; top:85%;"></button>
 
-    <button class="pin" data-id="spare-part-delivery" style="left:53.5%; top:57.0%;" title="Spare Part Delivery"></button>
-    <button class="pin" data-id="escalation-logistics" style="left:58.3%; top:54.2%;" title="Escalation"></button>
-
-    <button class="pin" data-id="parts-delivered" style="left:53.5%; top:74.5%;" title="Parts Delivered"></button>
-    <button class="pin" data-id="part-missing" style="left:69.5%; top:74.5%;" title="Part Missing"></button>
-
-    <button class="pin" data-id="customer-visit" style="left:53.5%; top:86.8%;" title="Customer Visit"></button>
-    <button class="pin" data-id="repair" style="left:61.5%; top:86.8%;" title="Repair"></button>
-    <button class="pin" data-id="consumption" style="left:69.5%; top:86.8%;" title="Consumption"></button>
-
-    <button class="pin" data-id="unused-return" style="left:82.0%; top:80.0%;" title="Unused Return"></button>
-    <button class="pin" data-id="send-back-factory" style="left:82.0%; top:92.0%;" title="Send Back to Factory"></button>
-
-    <button class="pin" data-id="end" style="left:94.0%; top:86.8%;" title="End"></button>
-
-  </div>
 </div>
 
-<div id="overlay"></div>
-
-<div id="popup">
-  <div class="popup-header">
-    <div>
-      <div class="bo-tag" id="popupBO"></div>
-      <div class="popup-title" id="popupTitle"></div>
-    </div>
-    <button class="close-btn" id="closeBtn">&times;</button>
-  </div>
-
-  <div class="popup-body">
-    <p class="popup-summary" id="popupSummary"></p>
-    <div class="ddp-label">Related DDPs</div>
-    <div id="ddpList"></div>
-  </div>
-</div>
+<div id="popup"></div>
 
 <script>
+
+/* BURAYI SEN DOLDURACAKSIN */
 const flowData = {
-  "start": {
-    bo: "START",
-    title: "Start",
-    summary: "Process starts here.",
-    ddps: []
-  },
-
-  "customer-contact": {
-    bo: "BO CODE HERE",
-    title: "Customer Contact",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "automatic-prepping": {
-    bo: "BO CODE HERE",
-    title: "Automatic Preprepping",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "appointment-scheduled": {
-    bo: "BO CODE HERE",
-    title: "Appointment Scheduled",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "atp-check-ic": {
-    bo: "BO CODE HERE",
-    title: "ATP Check - Interaction Center",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
   "manual-prepping": {
-    bo: "BO CODE HERE",
     title: "Manual Prepping",
-    summary: "Write short summary here.",
+    summary: "Write your own description",
     ddps: [
       {
         code: "DDP-XXXXX",
-        name: "DDP name here",
-        detail: "What it does and why it matters."
+        name: "DDP name",
+        detail: "Explain what it does"
       }
     ]
   },
 
-  "atp-check-bo": {
-    bo: "BO CODE HERE",
-    title: "ATP Check - Back Office",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
   "sps": {
-    bo: "BO CODE HERE",
-    title: "SPS - Spare Part Reservation",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "escalation-bo": {
-    bo: "BO CODE HERE",
-    title: "Escalation - Back Office",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "appointment-rescheduling": {
-    bo: "BO CODE HERE",
-    title: "Appointment Rescheduling Required",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "follow-up-appointment": {
-    bo: "BO CODE HERE",
-    title: "Follow-Up Appointment Scheduled",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "spare-part-delivery": {
-    bo: "BO CODE HERE",
-    title: "Spare Part Delivery",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "escalation-logistics": {
-    bo: "BO CODE HERE",
-    title: "Escalation - Logistics",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "parts-delivered": {
-    bo: "BO CODE HERE",
-    title: "Parts Delivered",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "part-missing": {
-    bo: "BO CODE HERE",
-    title: "Part Missing",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "customer-visit": {
-    bo: "BO CODE HERE",
-    title: "Customer Visit",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "repair": {
-    bo: "BO CODE HERE",
-    title: "Repair",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "consumption": {
-    bo: "BO CODE HERE",
-    title: "Consumption",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "unused-return": {
-    bo: "BO CODE HERE",
-    title: "Unused Return",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "send-back-factory": {
-    bo: "BO CODE HERE",
-    title: "Send Back to Factory",
-    summary: "Write short summary here.",
-    ddps: []
-  },
-
-  "end": {
-    bo: "END",
-    title: "End",
-    summary: "Process ends here.",
+    title: "SPS",
+    summary: "Write your own description",
     ddps: []
   }
 };
 
-let activePin = null;
-
+/* LOGIC */
 const popup = document.getElementById("popup");
-const overlay = document.getElementById("overlay");
-const closeBtn = document.getElementById("closeBtn");
 
-document.querySelectorAll(".pin").forEach(pin => {
+document.querySelectorAll(".info-pin").forEach(pin => {
   pin.addEventListener("click", e => {
-    e.stopPropagation();
 
     const id = pin.dataset.id;
     const data = flowData[id];
 
     if (!data) return;
 
-    if (activePin) {
-      activePin.classList.remove("active");
-    }
+    let html = `<h3>${data.title}</h3><p>${data.summary}</p>`;
 
-    activePin = pin;
-    pin.classList.add("active");
-
-    renderPopup(data);
-    positionPopup(pin);
-
-    popup.style.display = "block";
-    overlay.style.display = "block";
-  });
-});
-
-function renderPopup(data) {
-  document.getElementById("popupBO").textContent = data.bo || "";
-  document.getElementById("popupTitle").textContent = data.title || "";
-  document.getElementById("popupSummary").textContent = data.summary || "";
-
-  const ddpList = document.getElementById("ddpList");
-  ddpList.innerHTML = "";
-
-  if (!data.ddps || data.ddps.length === 0) {
-    ddpList.innerHTML = `<div style="color:#777; font-size:13px;">No DDP added yet.</div>`;
-    return;
-  }
-
-  data.ddps.forEach(ddp => {
-    const item = document.createElement("div");
-    item.className = "ddp-item";
-
-    item.innerHTML = `
-      <div class="ddp-header">
-        <span class="ddp-code">${ddp.code}</span>
-        <span class="ddp-name">${ddp.name}</span>
-      </div>
-      <div class="ddp-detail">${ddp.detail}</div>
-    `;
-
-    item.querySelector(".ddp-header").addEventListener("click", () => {
-      item.classList.toggle("open");
+    data.ddps.forEach(d => {
+      html += `
+        <div class="ddp">
+          <b>${d.code}</b> - ${d.name}
+          <div class="ddp-detail">${d.detail}</div>
+        </div>
+      `;
     });
 
-    ddpList.appendChild(item);
+    popup.innerHTML = html;
+    popup.style.display = "block";
+
+    popup.style.left = e.pageX + "px";
+    popup.style.top = e.pageY + "px";
   });
-}
-
-function positionPopup(pin) {
-  const rect = pin.getBoundingClientRect();
-
-  const popupWidth = 360;
-  const popupHeight = 420;
-
-  let left = rect.right + 16;
-  let top = rect.top - 20;
-
-  if (left + popupWidth > window.innerWidth) {
-    left = rect.left - popupWidth - 16;
-  }
-
-  if (top + popupHeight > window.innerHeight) {
-    top = window.innerHeight - popupHeight - 16;
-  }
-
-  if (left < 16) left = 16;
-  if (top < 16) top = 16;
-
-  popup.style.left = left + "px";
-  popup.style.top = top + "px";
-}
-
-function closePopup() {
-  popup.style.display = "none";
-  overlay.style.display = "none";
-
-  if (activePin) {
-    activePin.classList.remove("active");
-    activePin = null;
-  }
-}
-
-closeBtn.addEventListener("click", closePopup);
-overlay.addEventListener("click", closePopup);
-
-document.addEventListener("keydown", e => {
-  if (e.key === "Escape") closePopup();
 });
 
-window.addEventListener("resize", () => {
-  if (activePin) {
-    positionPopup(activePin);
+/* DDP expand */
+document.addEventListener("click", e => {
+  if (e.target.closest(".ddp")) {
+    e.target.closest(".ddp").classList.toggle("open");
+  } else if (!e.target.closest(".info-pin")) {
+    popup.style.display = "none";
   }
 });
+
 </script>
 
 </body>
