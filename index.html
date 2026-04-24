@@ -281,58 +281,16 @@
     detail: "Bu ne yapar, neden önemli açıklaması"
   }
 */
-const flowData = {
-  "start": {
-    "bo": "START",
-    "title": "Start",
-    "summary": "Müşteri talebi veya servis ihtiyacı ile lojistik destekli saha servis akışı başlar.",
-    "ddps": []
-  },
-  "customer-contact": {
-    "bo": "BO-IC",
-    "title": "Customer Contact",
-    "summary": "Müşteri servis ihtiyacı için Interaction Center ile iletişime geçer. Case bilgileri toplanır ve sonraki servis süreci başlatılır.",
-    "ddps": [
-      {
-        "code": "DDP-IC-001",
-        "name": "Capture Service Request",
-        "detail": "Müşteriden gelen servis talebinin doğru ve eksiksiz şekilde oluşturulmasını sağlar. Sonraki lojistik ve randevu adımları bu bilgiye göre ilerler."
-      }
-    ]
-  },
-  "automatic-preprepping": {
-    "bo": "BO-01",
-    "title": "Automatic Preprepping",
-    "summary": "Sistem, ürün ve arıza bilgisine göre gerekli olabilecek parçaları otomatik olarak önerir veya hazırlar.",
-    "ddps": [
-      {
-        "code": "DDP-57700",
-        "name": "Automatic Spare Part Request",
-        "detail": "Önerilen parçaların servis sürecine otomatik dahil edilmesini sağlar. Parça hazırlığı erken başlar ve manuel efor azalır."
-      }
-    ]
-  },
-  "appointment-scheduled": {
-    "bo": "BO-CC",
-    "title": "Appointment Scheduled",
-    "summary": "Müşteri için servis randevusu planlanır. Bu tarih, parça hazırlama ve teslimat zamanlamasını etkiler.",
-    "ddps": [
-      {
-        "code": "DDP-CC-010",
-        "name": "Appointment Booking Logic",
-        "detail": "Randevu tarihinin parça hazırlık ve teslimat süresiyle uyumlu olmasını sağlar."
-      }
-    ]
-  },
+const flowData = 
   "atp-check": {
-    "bo": "BO-ATP",
-    "title": "ATP Check",
-    "summary": "Parçanın stokta olup olmadığı veya ne zaman sağlanabileceği değerlendirilir.",
+    "bo": "DDP-60449 ",
+    "title": "[BO] 3.1 Work Management / 3.1.2 AutoPreprepping",
+    "summary": "",
     "ddps": [
       {
-        "code": "DDP-ATP-001",
-        "name": "Availability Check",
-        "detail": "Parçanın mevcut stok durumunu kontrol eder ve randevu / hazırlık kararlarının daha güvenilir alınmasına yardımcı olur."
+        "code": "DDP-58676",
+        "name": "PAR_FS: Provide spare part availability in warehouse",
+        "detail": "As a Prepper, Backoffice user, Technician I want to see real-time spare part availability information (traffic light indicator, stock quantity, ETA, and material blockage status) in the Work Order Products area so that I can make informed decisions on prepping, replacing, or escalating spare parts without causing unnecessary delays to the appointment."
       }
     ]
   },
