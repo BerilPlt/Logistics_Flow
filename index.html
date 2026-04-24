@@ -166,56 +166,20 @@
 
 <script>
 const flowData = {
-  interaction: {
-    bo: "IC",
-    title: "Interaction Center",
-    summary: "Customer request is received and the service process starts.",
-    ddps: []
-  },
-  start: {
-    bo: "Start",
-    title: "Start",
-    summary: "Beginning of the logistics and service flow.",
-    ddps: []
-  },
-  contact: {
-    bo: "BO 3.1",
-    title: "Customer Contact",
-    summary: "Customer contact is created and initial service needs are captured.",
-    ddps: []
-  },
-  auto: {
-    bo: "BO 3.1.2",
-    title: "Automatic Preprepping",
-    summary: "The system automatically identifies spare parts that may be needed for the work order.",
-    ddps: [
-      {
-        code: "DDP-58673",
-        name: "Prepping categorizations and status",
-        detail: "Defines part categories such as Mandatory, Planned and B2B and supports correct logistics triggering."
-      }
-    ]
-  },
-  appointment: {
-    bo: "Appointment",
-    title: "Appointment Scheduled",
-    summary: "The first appointment is scheduled based on customer and service availability.",
-    ddps: []
-  },
   manual: {
-    bo: "BO 3.1.2",
+    bo: "DDP-60449 [BO] 3.1 Work Management / 3.1.2 AutoPreprepping",
     title: "Manual Prepping",
     summary: "Backoffice can manually prepare or adjust spare part requests when needed.",
     ddps: [
       {
-        code: "DDP-58673",
-        name: "Prepping categorizations and status",
-        detail: "Allows spare part requests to have clear categories and statuses so the correct SAP logistics process can be triggered."
+        code: "DDP-58673 ",
+        name: "PAR_FS: Prepping categorizations and status",
+        detail: "As a Backoffice user, I want spare part requests to have different categorizations (Mandatory, Planned, B2B) and statuses (Proposal, Preprepped, Canceled) so that the correct SAP-P4B logistics order is triggered and I can track the delivery progress through the subsequent warehouse statuses up until the material is received for the work order."
       },
       {
         code: "DDP-58674",
-        name: "Manual prepping logic",
-        detail: "Supports manual adjustment of spare part requests before reservation or delivery steps."
+        name: "PAR_FS: Spare part management prepping rules ",
+        detail: "As a Backoffice user, I want the spare part prepping process to reflect ERP material statuses (AA, AE, AK, AB) and material validity for the service organization so that I am warned or blocked accordingly, and unnecessary stock movements that could lead to scrapping are avoided."
       }
     ]
   },
