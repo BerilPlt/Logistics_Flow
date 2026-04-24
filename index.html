@@ -1,346 +1,532 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LOGISTICS FLOW</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Logistics Flow</title>
+
 <style>
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  :root {
-    --red: #E84525;
-    --bg: #0e0e0e;
-    --surface: #161616;
-    --border: rgba(255,255,255,0.08);
-    --text: #f0f0f0;
-    --muted: #888;
-    --tag-bg: rgba(232,69,37,0.12);
-    --tag-border: rgba(232,69,37,0.3);
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
-  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
-  header { background: #000; border-bottom: 1px solid var(--border); padding: 0 2rem; height: 52px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; }
-  header .logo { font-weight: 700; font-size: 1rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text); }
-  header .logo span { color: var(--red); }
-  header .hint { font-size: 0.72rem; color: var(--muted); font-family: 'DM Mono', monospace; letter-spacing: 0.04em; }
-  .diagram-wrapper { position: relative; width: 100%; max-width: 1440px; margin: 1.5rem auto; padding: 0 1.5rem; }
-  .diagram-container { position: relative; width: 100%; user-select: none; }
-  .diagram-container img { display: block; width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--border); }
-  .hotspot { position: absolute; cursor: pointer; border-radius: 3px; border: 2px solid transparent; transition: background 0.15s, border-color 0.15s; }
-  .hotspot:hover { background: rgba(232,69,37,0.14); border-color: rgba(232,69,37,0.7); }
-  .hotspot.active { background: rgba(232,69,37,0.2); border-color: var(--red); box-shadow: 0 0 0 3px rgba(232,69,37,0.18); }
-  #popup { display: none; position: fixed; z-index: 999; width: 340px; background: #1a1a1a; border: 1px solid rgba(232,69,37,0.35); border-radius: 10px; box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.04); overflow: hidden; font-size: 0.82rem; animation: popIn 0.18s cubic-bezier(0.34,1.56,0.64,1); }
-  @keyframes popIn { from { opacity:0; transform:scale(0.92) translateY(6px); } to { opacity:1; transform:scale(1) translateY(0); } }
-  #popup .popup-header { background: linear-gradient(135deg,#1f1f1f,#141414); border-bottom: 1px solid var(--border); padding: 14px 16px 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
-  #popup .popup-header-left { flex: 1; }
-  #popup .bo-tag { display: inline-block; font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--red); background: var(--tag-bg); border: 1px solid var(--tag-border); border-radius: 3px; padding: 2px 7px; margin-bottom: 6px; letter-spacing: 0.06em; }
-  #popup .popup-title { font-size: 0.95rem; font-weight: 600; color: #fff; line-height: 1.3; }
-  #popup .close-btn { background: none; border: none; color: var(--muted); cursor: pointer; font-size: 1.1rem; padding: 0; line-height: 1; flex-shrink: 0; margin-top: 2px; }
-  #popup .close-btn:hover { color: #fff; }
-  #popup .popup-body { padding: 14px 16px; }
-  #popup .popup-summary { color: #c0c0c0; line-height: 1.6; margin-bottom: 14px; font-size: 0.8rem; }
-  #popup .ddp-label { font-family: 'DM Mono', monospace; font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-  .ddp-list { display: flex; flex-direction: column; gap: 5px; }
-  .ddp-item { border: 1px solid var(--border); border-radius: 6px; overflow: hidden; transition: border-color 0.15s; }
-  .ddp-item:hover { border-color: rgba(232,69,37,0.3); }
-  .ddp-item.open  { border-color: rgba(232,69,37,0.45); }
-  .ddp-header { display: flex; align-items: center; gap: 8px; padding: 8px 10px; cursor: pointer; background: rgba(255,255,255,0.02); transition: background 0.12s; }
-  .ddp-header:hover { background: rgba(255,255,255,0.05); }
-  .ddp-item.open .ddp-header { background: rgba(232,69,37,0.07); }
-  .ddp-code { font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--red); background: var(--tag-bg); padding: 2px 5px; border-radius: 3px; flex-shrink: 0; }
-  .ddp-name { font-size: 0.78rem; font-weight: 500; color: #ddd; flex: 1; line-height: 1.3; }
-  .ddp-chevron { color: var(--muted); font-size: 0.7rem; transition: transform 0.2s; flex-shrink: 0; }
-  .ddp-item.open .ddp-chevron { transform: rotate(180deg); color: var(--red); }
-  .ddp-detail { display: none; padding: 8px 10px 10px; font-size: 0.76rem; color: #a0a0a0; line-height: 1.65; border-top: 1px solid var(--border); background: rgba(0,0,0,0.2); }
-  .ddp-item.open .ddp-detail { display: block; }
-  #overlay { display: none; position: fixed; inset: 0; z-index: 998; }
+
+  body {
+    font-family: Arial, sans-serif;
+    background: #0e0e0e;
+    color: #fff;
+  }
+
+  header {
+    height: 56px;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  header h1 {
+    font-size: 16px;
+    letter-spacing: 2px;
+  }
+
+  header span {
+    color: #E84525;
+  }
+
+  .hint {
+    font-size: 12px;
+    color: #999;
+  }
+
+  .diagram-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1600px;
+    margin: 24px auto;
+    padding: 0 24px;
+  }
+
+  .diagram-container {
+    position: relative;
+    width: 100%;
+  }
+
+  .diagram-container img {
+    width: 100%;
+    display: block;
+    border-radius: 6px;
+  }
+
+  .hotspot {
+    position: absolute;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .hotspot:hover,
+  .hotspot.active {
+    background: rgba(232, 69, 37, 0.16);
+    outline: 2px solid rgba(232, 69, 37, 0.75);
+  }
+
+  /* DEBUG MODE: hotspotları görmek için açık bırak, bitince kapat */
+  .hotspot {
+    border: 2px solid red;
+    background: rgba(255, 0, 0, 0.12);
+  }
+
+  #popup {
+    display: none;
+    position: fixed;
+    width: 360px;
+    max-height: 80vh;
+    overflow-y: auto;
+    z-index: 999;
+    background: #1a1a1a;
+    border: 1px solid rgba(232,69,37,0.45);
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+  }
+
+  .popup-header {
+    padding: 16px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .bo-tag {
+    display: inline-block;
+    color: #E84525;
+    background: rgba(232,69,37,0.12);
+    border: 1px solid rgba(232,69,37,0.35);
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    margin-bottom: 8px;
+  }
+
+  .popup-title {
+    font-size: 17px;
+    font-weight: bold;
+    line-height: 1.3;
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 22px;
+    cursor: pointer;
+  }
+
+  .popup-body {
+    padding: 16px;
+  }
+
+  .popup-summary {
+    color: #ccc;
+    line-height: 1.5;
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  .ddp-label {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .ddp-item {
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .ddp-header {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .ddp-code {
+    color: #E84525;
+    font-weight: bold;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .ddp-name {
+    color: #ddd;
+    font-size: 13px;
+    flex: 1;
+  }
+
+  .ddp-detail {
+    display: none;
+    padding: 10px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    color: #aaa;
+    font-size: 13px;
+    line-height: 1.5;
+    background: rgba(0,0,0,0.25);
+  }
+
+  .ddp-item.open .ddp-detail {
+    display: block;
+  }
+
+  #overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 998;
+  }
 </style>
 </head>
+
 <body>
+
 <header>
-  <div class="logo">LOGISTICS <span>FLOW</span></div>
+  <h1>LOGISTICS <span>FLOW</span></h1>
   <div class="hint">Click any process box to explore</div>
 </header>
 
 <div class="diagram-wrapper">
   <div class="diagram-container" id="diagramContainer">
-    <img src="flow.png"/>
 
-    <!-- ========= HOTSPOTS (pixel-verified positions) ========= -->
-    <!-- IC Lane -->
-    <div class="hotspot" data-id="customer-contact"      style="left:25.9%;top:11.3%;width:6.1%;height:9.4%"></div>
-    <div class="hotspot" data-id="automatic-prepping"    style="left:33.6%;top:11.3%;width:6.4%;height:9.4%"></div>
-    <div class="hotspot" data-id="appointment-scheduled" style="left:41.0%;top:11.3%;width:6.2%;height:9.4%"></div>
-    <div class="hotspot" data-id="atp-check-ic"          style="left:45.6%;top:7.8%;width:6.2%;height:3.0%"></div>
+    <img src="flow.png" alt="Logistics Flow Diagram" />
 
-    <!-- Back Office Lane -->
-    <div class="hotspot" data-id="manual-prepping"       style="left:41.0%;top:25.9%;width:6.2%;height:9.4%"></div>
-    <div class="hotspot" data-id="atp-check-bo"          style="left:45.8%;top:25.0%;width:6.2%;height:3.1%"></div>
-    <div class="hotspot" data-id="sps"                   style="left:53.4%;top:25.9%;width:6.2%;height:9.4%"></div>
-    <div class="hotspot" data-id="escalation-bo"         style="left:58.2%;top:25.1%;width:6.2%;height:3.0%"></div>
-    <div class="hotspot" data-id="appt-reschedule"       style="left:70.8%;top:26.0%;width:6.2%;height:9.3%"></div>
-    <div class="hotspot" data-id="followup-appt"         style="left:70.8%;top:40.0%;width:6.2%;height:9.2%"></div>
+    <!-- HOTSPOTS: Buradaki left/top/width/height değerlerini sen ayarlayabilirsin -->
 
-    <!-- Logistics Lane -->
-    <div class="hotspot" data-id="spare-part-delivery"   style="left:53.4%;top:54.0%;width:6.2%;height:9.0%"></div>
-    <div class="hotspot" data-id="escalation-log"        style="left:58.2%;top:52.4%;width:6.2%;height:4.1%"></div>
+    <div class="hotspot" data-id="customer-contact" style="left:25.9%; top:11.3%; width:6.1%; height:9.4%;"></div>
+    <div class="hotspot" data-id="automatic-prepping" style="left:33.6%; top:11.3%; width:6.4%; height:9.4%;"></div>
+    <div class="hotspot" data-id="appointment-scheduled" style="left:41.0%; top:11.3%; width:6.2%; height:9.4%;"></div>
+    <div class="hotspot" data-id="atp-check-ic" style="left:45.6%; top:7.8%; width:6.2%; height:3.0%;"></div>
 
-    <!-- Technician Lane -->
-    <div class="hotspot" data-id="parts-delivered"       style="left:53.4%;top:71.3%;width:6.2%;height:9.5%"></div>
-    <div class="hotspot" data-id="part-missing"          style="left:70.7%;top:71.3%;width:6.2%;height:9.5%"></div>
-    <div class="hotspot" data-id="customer-visit"        style="left:53.4%;top:84.2%;width:6.2%;height:9.5%"></div>
-    <div class="hotspot" data-id="repair"                style="left:62.1%;top:84.2%;width:6.1%;height:9.5%"></div>
-    <div class="hotspot" data-id="consumption"           style="left:70.7%;top:84.2%;width:6.2%;height:9.5%"></div>
-    <div class="hotspot" data-id="unused-return"         style="left:84.4%;top:78.0%;width:6.1%;height:5.0%"></div>
-    <div class="hotspot" data-id="send-back-factory"     style="left:84.4%;top:90.0%;width:6.1%;height:4.5%"></div>
+    <div class="hotspot" data-id="manual-prepping" style="left:41.0%; top:25.9%; width:6.2%; height:9.4%;"></div>
+    <div class="hotspot" data-id="atp-check-bo" style="left:45.8%; top:25.0%; width:6.2%; height:3.1%;"></div>
+    <div class="hotspot" data-id="sps" style="left:53.4%; top:25.9%; width:6.2%; height:9.4%;"></div>
+    <div class="hotspot" data-id="escalation-bo" style="left:58.2%; top:25.1%; width:6.2%; height:3.0%;"></div>
+    <div class="hotspot" data-id="appointment-rescheduling" style="left:70.8%; top:26.0%; width:6.2%; height:9.3%;"></div>
+    <div class="hotspot" data-id="follow-up-appointment" style="left:70.8%; top:40.0%; width:6.2%; height:9.2%;"></div>
+
+    <div class="hotspot" data-id="spare-part-delivery" style="left:53.4%; top:54.0%; width:6.2%; height:9.0%;"></div>
+    <div class="hotspot" data-id="escalation-logistics" style="left:58.2%; top:52.4%; width:6.2%; height:4.1%;"></div>
+
+    <div class="hotspot" data-id="parts-delivered" style="left:53.4%; top:71.3%; width:6.2%; height:9.5%;"></div>
+    <div class="hotspot" data-id="part-missing" style="left:70.7%; top:71.3%; width:6.2%; height:9.5%;"></div>
+    <div class="hotspot" data-id="customer-visit" style="left:53.4%; top:84.2%; width:6.2%; height:9.5%;"></div>
+    <div class="hotspot" data-id="repair" style="left:62.1%; top:84.2%; width:6.1%; height:9.5%;"></div>
+    <div class="hotspot" data-id="consumption" style="left:70.7%; top:84.2%; width:6.2%; height:9.5%;"></div>
+    <div class="hotspot" data-id="unused-return" style="left:84.4%; top:78.0%; width:6.1%; height:5.0%;"></div>
+    <div class="hotspot" data-id="send-back-factory" style="left:84.4%; top:90.0%; width:6.1%; height:4.5%;"></div>
+
   </div>
 </div>
 
 <div id="overlay"></div>
+
 <div id="popup">
   <div class="popup-header">
-    <div class="popup-header-left">
+    <div>
       <div class="bo-tag" id="popupBO"></div>
       <div class="popup-title" id="popupTitle"></div>
     </div>
     <button class="close-btn" id="closeBtn">&times;</button>
   </div>
+
   <div class="popup-body">
     <p class="popup-summary" id="popupSummary"></p>
-    <div class="ddp-label">Decision &amp; Design Points</div>
-    <div class="ddp-list" id="ddpList"></div>
+    <div class="ddp-label">Related DDPs</div>
+    <div id="ddpList"></div>
   </div>
 </div>
 
 <script>
+/*
+  DDP içeriklerini sadece buradan güncelle.
+  Her kutunun data-id değeri ile aşağıdaki key aynı olmalı.
+*/
+
 const flowData = {
   "customer-contact": {
-    bo: "BO-01", title: "Customer Contact",
-    summary: "The process begins when a customer reaches out via the Interaction Center. The agent logs the request, validates customer identity, and creates a service order to kick off the workflow.",
+    bo: "BO CODE HERE",
+    title: "Customer Contact",
+    summary: "Write short summary here.",
     ddps: [
-      { code: "DDP-001", name: "Channel Identification", detail: "Determines which inbound channel (phone, email, portal) the customer used. Affects routing rules and SLA timestamps." },
-      { code: "DDP-002", name: "Customer Validation", detail: "Verifies the customer account and entitlement before creating a work order, preventing unauthorised service requests." },
-      { code: "DDP-003", name: "Symptom Capture", detail: "Records the reported fault or symptom against the asset, feeding directly into the automated prepping algorithm to identify likely spare parts." }
+      {
+        code: "DDP-XXXXX",
+        name: "DDP name here",
+        detail: "What it does and why it matters."
+      }
     ]
   },
+
   "automatic-prepping": {
-    bo: "BO-01", title: "Automatic Prepping",
-    summary: "The system automatically analyses the reported symptom and historical repair data to predict which spare parts will be needed, then triggers an ATP availability check before scheduling.",
+    bo: "BO CODE HERE",
+    title: "Automatic Preprepping",
+    summary: "Write short summary here.",
     ddps: [
-      { code: "DDP-004", name: "Predictive Parts Engine", detail: "Uses ML-based fault-to-part mapping to recommend the top 3 likely parts. Accuracy above 80% reduces field revisit rate." },
-      { code: "DDP-005", name: "ATP Trigger Condition", detail: "If ATP confirms part availability, scheduling proceeds automatically. If not, the flow escalates to Manual Prepping in Back Office." },
-      { code: "DDP-006", name: "Prepping Audit Trail", detail: "Every auto-prep decision is logged with confidence score and part IDs for quality review and model retraining." }
+      {
+        code: "DDP-XXXXX",
+        name: "DDP name here",
+        detail: "What it does and why it matters."
+      }
     ]
   },
+
   "appointment-scheduled": {
-    bo: "BO-01", title: "Appointment Scheduled",
-    summary: "Once parts are confirmed available, the system books a technician slot and sends the customer a confirmation. The appointment is locked to the committed ATP window.",
-    ddps: [
-      { code: "DDP-007", name: "Slot Optimisation Rule", detail: "Assigns the nearest available technician using geography and skill matching. Reduces average travel time and improves first-time fix rate." },
-      { code: "DDP-008", name: "Customer Notification", detail: "Automated confirmation sent via the customer's preferred channel. Includes date, window, and technician contact." },
-      { code: "DDP-009", name: "Appointment Lock Policy", detail: "The appointment cannot be changed without Back Office authorisation once the spare part has entered the logistics pipeline." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Appointment Scheduled",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "atp-check-ic": {
-    bo: "BO-01", title: "ATP Check (Interaction Center)",
-    summary: "Available-to-Promise check run at the Interaction Center level. Confirms that all predicted spare parts are in stock and can be committed to the appointment date.",
-    ddps: [
-      { code: "DDP-010", name: "ATP Threshold", detail: "A part is considered available only if stock is above the safety stock level. Below threshold, the check fails and flows to Manual Prepping." },
-      { code: "DDP-011", name: "Multi-Warehouse Scope", detail: "The check spans all regional warehouses, not just the local one, to maximise availability confirmation rate." }
-    ]
+    bo: "BO CODE HERE",
+    title: "ATP Check - Interaction Center",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "manual-prepping": {
-    bo: "BO-02", title: "Manual Prepping",
-    summary: "Back Office agents manually review the service order when automatic prepping fails. They confirm or adjust the parts list, source from alternative locations, and re-check ATP before proceeding.",
+    bo: "BO CODE HERE",
+    title: "Manual Prepping",
+    summary: "Write short summary here.",
     ddps: [
-      { code: "DDP-012", name: "Escalation Trigger", detail: "Manual Prepping is initiated whenever Automatic Prepping cannot confirm all required parts within the standard ATP window." },
-      { code: "DDP-013", name: "Alternative Sourcing", detail: "Agents may substitute parts from approved equivalent lists or request inter-depot transfers to meet the appointment date." },
-      { code: "DDP-014", name: "SLA Clock Management", detail: "The original SLA clock continues running during Manual Prepping. Agents must complete the step within 2 business hours to avoid breach." }
+      {
+        code: "DDP-58673",
+        name: "Prepping categorizations and status",
+        detail: "Update this text with your own explanation."
+      },
+      {
+        code: "DDP-58674",
+        name: "DDP name here",
+        detail: "Update this text with your own explanation."
+      }
     ]
   },
+
   "atp-check-bo": {
-    bo: "BO-02", title: "ATP Check (Back Office)",
-    summary: "Second-level ATP check performed by Back Office after manual part selection. Validates that the chosen parts can be physically committed before moving to SPS.",
-    ddps: [
-      { code: "DDP-015", name: "Commit vs. Soft Reserve", detail: "This step issues a hard commit in the ERP, freezing inventory. A soft reserve from auto-prepping is upgraded to a hard reserve here." },
-      { code: "DDP-016", name: "Failure Escalation Path", detail: "If the BO ATP check also fails, the order is flagged for Appointment Rescheduling and the customer is proactively notified." }
-    ]
+    bo: "BO CODE HERE",
+    title: "ATP Check - Back Office",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "sps": {
-    bo: "BO-02", title: "SPS – Spare Part Reservation",
-    summary: "The Spare Part Reservation step formally reserves the required parts in the ERP/WMS against the service order. This guarantees the part will be picked and shipped on time.",
-    ddps: [
-      { code: "DDP-017", name: "Reservation Validity Window", detail: "Reservations are valid for 48 hours. If the part is not dispatched within this window, the reservation auto-expires and triggers a re-check." },
-      { code: "DDP-018", name: "Partial Reservation Handling", detail: "If only some parts are available, a partial reservation is placed and remaining items are backordered. The appointment is only confirmed when all parts are reserved." },
-      { code: "DDP-019", name: "ERP Integration Point", detail: "SPS writes directly to the ERP stock allocation table. Any failure here must be resolved before proceeding to Logistics." },
-      { code: "DDP-020", name: "Escalation Condition", detail: "If SPS cannot complete the reservation within the SLA window, the order escalates with a flag visible to Back Office supervisors." }
-    ]
+    bo: "BO CODE HERE",
+    title: "SPS",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "escalation-bo": {
-    bo: "BO-02", title: "Escalation (Back Office)",
-    summary: "Triggered when the SPS step cannot confirm a full reservation. The Back Office supervisor is alerted and the process branches to Appointment Rescheduling Required.",
-    ddps: [
-      { code: "DDP-021", name: "Escalation Priority Levels", detail: "Three levels: P1 (SLA breach imminent), P2 (within 24h of breach), P3 (buffer exists). Determines supervisor response time SLA." },
-      { code: "DDP-022", name: "Customer Communication Rule", detail: "P1 and P2 escalations require proactive customer notification within 1 hour. P3 can be resolved silently if rescheduling is within the original window." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Escalation - Back Office",
+    summary: "Write short summary here.",
+    ddps: []
   },
-  "appt-reschedule": {
-    bo: "BO-02", title: "Appointment Rescheduling Required",
-    summary: "When parts cannot be confirmed in time, the appointment must be moved. Back Office selects the next viable slot based on updated ATP and informs the customer.",
-    ddps: [
-      { code: "DDP-023", name: "Rescheduling Window Policy", detail: "The new appointment must be booked within 5 business days of the original date. Beyond this, the case is escalated to account management." },
-      { code: "DDP-024", name: "Customer Consent Requirement", detail: "The customer must acknowledge the new slot. If no response within 24h, the system auto-confirms the next available slot per the service agreement." }
-    ]
+
+  "appointment-rescheduling": {
+    bo: "BO CODE HERE",
+    title: "Appointment Rescheduling Required",
+    summary: "Write short summary here.",
+    ddps: []
   },
-  "followup-appt": {
-    bo: "BO-02", title: "Follow-Up Appointment Scheduled",
-    summary: "A new appointment is confirmed after parts availability is revalidated. The follow-up is tracked separately to monitor rescheduling KPIs and customer satisfaction impact.",
-    ddps: [
-      { code: "DDP-025", name: "KPI Tagging", detail: "Follow-up appointments are tagged as Rescheduled in the analytics layer to measure rescheduling rate and root-cause distribution." },
-      { code: "DDP-026", name: "Priority Queue Entry", detail: "Rescheduled orders enter a priority queue for parts dispatch to reduce the risk of a second reschedule." }
-    ]
+
+  "follow-up-appointment": {
+    bo: "BO CODE HERE",
+    title: "Follow-Up Appointment Scheduled",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "spare-part-delivery": {
-    bo: "BO-03", title: "Spare Part Delivery",
-    summary: "Logistics coordinates the physical pick, pack, and dispatch of reserved spare parts to the technician or customer site. Tracking is shared with the technician.",
-    ddps: [
-      { code: "DDP-027", name: "Dispatch Cut-Off Rule", detail: "Parts must be dispatched by 14:00 to guarantee next-day delivery. Late picks trigger an automatic Logistics escalation." },
-      { code: "DDP-028", name: "Delivery Confirmation Scan", detail: "A delivered scan by the carrier updates the WMS and automatically progresses the order to Parts Delivered status." },
-      { code: "DDP-029", name: "Carrier SLA Monitoring", detail: "Real-time carrier tracking is polled every 2 hours. Delays beyond threshold trigger the Logistics Escalation path." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Spare Part Delivery",
+    summary: "Write short summary here.",
+    ddps: []
   },
-  "escalation-log": {
-    bo: "BO-03", title: "Escalation (Logistics)",
-    summary: "Raised when a delivery is delayed, a package is lost, or a wrong part is shipped. Logistics supervisor reviews and decides to re-ship or reschedule the appointment.",
-    ddps: [
-      { code: "DDP-030", name: "Re-ship vs. Reschedule Decision", detail: "If a replacement part can arrive before the appointment window closes, re-shipment is authorised. Otherwise, the appointment is rescheduled." },
-      { code: "DDP-031", name: "Carrier Claim Initiation", detail: "Lost or damaged parts trigger an automatic carrier claim. The replacement is dispatched in parallel to avoid SLA breach." }
-    ]
+
+  "escalation-logistics": {
+    bo: "BO CODE HERE",
+    title: "Escalation - Logistics",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "parts-delivered": {
-    bo: "BO-04", title: "Parts Delivered",
-    summary: "Confirmation that all reserved parts have physically arrived at the technician or the site. This unlocks the Customer Visit step.",
-    ddps: [
-      { code: "DDP-032", name: "Delivery Verification Checklist", detail: "Technician must scan and confirm each part against the service order before the Parts Delivered status is set. Prevents the Part Missing exception." },
-      { code: "DDP-033", name: "Partial Delivery Handling", detail: "If only some parts are delivered, the system checks whether the repair can proceed with available parts, or must wait for the remainder." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Parts Delivered",
+    summary: "Write short summary here.",
+    ddps: []
   },
-  "customer-visit": {
-    bo: "BO-04", title: "Customer Visit",
-    summary: "The technician arrives on site, checks in via the mobile app, reviews the service order, and begins diagnosing and repairing the asset.",
-    ddps: [
-      { code: "DDP-034", name: "Check-In Geofencing", detail: "The technician check-in is validated against a 500m geofence around the customer address to confirm on-site presence." },
-      { code: "DDP-035", name: "Safety Assessment Step", detail: "Before starting work, the technician completes a site safety checklist. Non-compliance blocks progression to the Repair step." },
-      { code: "DDP-036", name: "Customer Signature Capture", detail: "The customer signs a digital access authorisation on the technician device before any work begins." }
-    ]
-  },
+
   "part-missing": {
-    bo: "BO-04", title: "Part Missing",
-    summary: "Flagged when a technician cannot locate a required part after delivery confirmation. Triggers a return loop to Spare Part Delivery for re-shipment.",
-    ddps: [
-      { code: "DDP-037", name: "Missing Part Report", detail: "Technician documents the missing item with photo evidence via the mobile app. Auto-creates a re-shipment request in Logistics." },
-      { code: "DDP-038", name: "SLA Impact Assessment", detail: "System calculates SLA breach risk. If breach is unavoidable, escalation is sent to Back Office to manage customer expectations." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Part Missing",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
+  "customer-visit": {
+    bo: "BO CODE HERE",
+    title: "Customer Visit",
+    summary: "Write short summary here.",
+    ddps: []
+  },
+
   "repair": {
-    bo: "BO-04", title: "Repair",
-    summary: "The core service activity. The technician performs the repair using the delivered parts, following the service manual procedure linked to the fault code.",
-    ddps: [
-      { code: "DDP-039", name: "Fault Code Confirmation", detail: "The technician confirms or updates the fault code after diagnosis. This feeds accuracy metrics for the predictive prepping engine." },
-      { code: "DDP-040", name: "Repair Time Logging", detail: "Start and end times are captured automatically. Variance from standard repair time triggers a quality review." },
-      { code: "DDP-041", name: "First-Time Fix Check", detail: "If the asset is not restored to working condition, a second visit is created and tagged as a Failed First-Time Fix for reporting." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Repair",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "consumption": {
-    bo: "BO-04", title: "Consumption",
-    summary: "The technician records which parts were actually used during the repair. This updates inventory in real time and drives the split between unused returns and factory send-backs.",
-    ddps: [
-      { code: "DDP-042", name: "Consumption vs. Reservation Match", detail: "The system compares consumed parts against the original reservation. Unmatched consumption triggers a stock discrepancy alert." },
-      { code: "DDP-043", name: "Serial Number Capture", detail: "Serialised parts must have their serial numbers scanned at consumption. Required for warranty tracking and asset history." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Consumption",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "unused-return": {
-    bo: "BO-04", title: "Unused Return",
-    summary: "Parts that were delivered but not consumed are returned to the warehouse. The technician initiates a return via the mobile app and ships the parts back.",
-    ddps: [
-      { code: "DDP-044", name: "Return Label Generation", detail: "The system auto-generates a return shipping label linked to the original order. Technician must dispatch within 24h of job completion." },
-      { code: "DDP-045", name: "Condition Assessment", detail: "Returned parts are graded on receipt (A: unopened, B: opened but unused, C: damaged). Grade determines whether the part re-enters stock or is scrapped." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Unused Return",
+    summary: "Write short summary here.",
+    ddps: []
   },
+
   "send-back-factory": {
-    bo: "BO-04", title: "Send Back to Factory",
-    summary: "Faulty or defective parts removed from the customer asset are returned to the factory or repair depot for analysis, remanufacturing, or warranty claim processing.",
-    ddps: [
-      { code: "DDP-046", name: "Defect Tagging", detail: "The technician tags the returned part with a fault description and symptom code. Used by the factory for root-cause analysis." },
-      { code: "DDP-047", name: "Warranty Claim Linkage", detail: "If the part is under manufacturer warranty, a claim is automatically opened against the supplier when the return is scanned at the factory." }
-    ]
+    bo: "BO CODE HERE",
+    title: "Send Back to Factory",
+    summary: "Write short summary here.",
+    ddps: []
   }
 };
 
 let activeHotspot = null;
-const popup   = document.getElementById('popup');
-const overlay = document.getElementById('overlay');
-const closeBtn = document.getElementById('closeBtn');
 
-document.querySelectorAll('.hotspot').forEach(hs => {
-  hs.addEventListener('click', e => {
+const popup = document.getElementById("popup");
+const overlay = document.getElementById("overlay");
+const closeBtn = document.getElementById("closeBtn");
+
+document.querySelectorAll(".hotspot").forEach(hotspot => {
+  hotspot.addEventListener("click", e => {
     e.stopPropagation();
-    const id = hs.dataset.id;
-    if (!flowData[id]) return;
-    if (activeHotspot) activeHotspot.classList.remove('active');
-    activeHotspot = hs;
-    hs.classList.add('active');
-    renderPopup(id);
-    positionPopup(hs);
-    popup.style.display = 'block';
-    overlay.style.display = 'block';
+
+    const id = hotspot.dataset.id;
+    const data = flowData[id];
+
+    if (!data) {
+      alert("No data found for: " + id);
+      return;
+    }
+
+    if (activeHotspot) {
+      activeHotspot.classList.remove("active");
+    }
+
+    activeHotspot = hotspot;
+    hotspot.classList.add("active");
+
+    renderPopup(data);
+    positionPopup(hotspot);
+
+    popup.style.display = "block";
+    overlay.style.display = "block";
   });
 });
 
-function renderPopup(id) {
-  const d = flowData[id];
-  document.getElementById('popupBO').textContent    = d.bo;
-  document.getElementById('popupTitle').textContent  = d.title;
-  document.getElementById('popupSummary').textContent = d.summary;
-  const list = document.getElementById('ddpList');
-  list.innerHTML = '';
-  (d.ddps || []).forEach(ddp => {
-    const item = document.createElement('div');
-    item.className = 'ddp-item';
+function renderPopup(data) {
+  document.getElementById("popupBO").textContent = data.bo || "";
+  document.getElementById("popupTitle").textContent = data.title || "";
+  document.getElementById("popupSummary").textContent = data.summary || "";
+
+  const ddpList = document.getElementById("ddpList");
+  ddpList.innerHTML = "";
+
+  if (!data.ddps || data.ddps.length === 0) {
+    ddpList.innerHTML = `<div style="color:#777; font-size:13px;">No DDP added yet.</div>`;
+    return;
+  }
+
+  data.ddps.forEach(ddp => {
+    const item = document.createElement("div");
+    item.className = "ddp-item";
+
     item.innerHTML = `
       <div class="ddp-header">
         <span class="ddp-code">${ddp.code}</span>
         <span class="ddp-name">${ddp.name}</span>
-        <span class="ddp-chevron">&#9660;</span>
       </div>
-      <div class="ddp-detail">${ddp.detail}</div>`;
-    item.querySelector('.ddp-header').addEventListener('click', () => item.classList.toggle('open'));
-    list.appendChild(item);
+      <div class="ddp-detail">${ddp.detail}</div>
+    `;
+
+    item.querySelector(".ddp-header").addEventListener("click", () => {
+      item.classList.toggle("open");
+    });
+
+    ddpList.appendChild(item);
   });
 }
 
-function positionPopup(hs) {
-  const rect = hs.getBoundingClientRect();
-  const pw = 340, ph = popup.scrollHeight || 380;
-  const vw = window.innerWidth, vh = window.innerHeight;
-  let left = rect.right + 12, top = rect.top;
-  if (left + pw > vw - 10) left = rect.left - pw - 12;
-  if (left < 10) left = 10;
-  if (top + ph > vh - 10) top = vh - ph - 10;
-  if (top < 10) top = 10;
-  popup.style.left = left + 'px';
-  popup.style.top  = top  + 'px';
+function positionPopup(hotspot) {
+  const rect = hotspot.getBoundingClientRect();
+
+  const popupWidth = 360;
+  const popupHeight = 420;
+
+  let left = rect.right + 12;
+  let top = rect.top;
+
+  if (left + popupWidth > window.innerWidth) {
+    left = rect.left - popupWidth - 12;
+  }
+
+  if (top + popupHeight > window.innerHeight) {
+    top = window.innerHeight - popupHeight - 16;
+  }
+
+  if (left < 16) left = 16;
+  if (top < 16) top = 16;
+
+  popup.style.left = left + "px";
+  popup.style.top = top + "px";
 }
 
 function closePopup() {
-  popup.style.display = 'none';
-  overlay.style.display = 'none';
-  if (activeHotspot) { activeHotspot.classList.remove('active'); activeHotspot = null; }
+  popup.style.display = "none";
+  overlay.style.display = "none";
+
+  if (activeHotspot) {
+    activeHotspot.classList.remove("active");
+    activeHotspot = null;
+  }
 }
 
-closeBtn.addEventListener('click', closePopup);
-overlay.addEventListener('click', closePopup);
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closePopup(); });
-window.addEventListener('resize', () => { if (activeHotspot) positionPopup(activeHotspot); });
+closeBtn.addEventListener("click", closePopup);
+overlay.addEventListener("click", closePopup);
+
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") closePopup();
+});
 </script>
+
 </body>
 </html>
