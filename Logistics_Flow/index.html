@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Paramount Logistics Flow</title>
+
+<style>
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: #0e0e0e;
+    font-family: Arial, sans-serif;
+  }
+
+  .wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 1536px;
+    margin: 0 auto;
+  }
+
+  .wrapper img {
+    width: 100%;
+    display: block;
+  }
+
+  .hotspot {
+    position: absolute;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+
+  .hotspot:hover {
+    background: rgba(255, 90, 47, 0.18);
+    outline: 2px solid rgba(255, 90, 47, 0.8);
+  }
+
+  /* Debug için açabilirsin */
+  /*
+  .hotspot {
+    border: 2px solid red;
+  }
+  */
+
+  .popup {
+    position: fixed;
+    display: none;
+    z-index: 999;
+    width: 340px;
+    background: #1a1a1a;
+    color: #fff;
+    border: 1px solid #ff5a2f;
+    border-radius: 10px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    padding: 16px;
+  }
+
+  .popup h3 {
+    margin: 0 0 8px;
+    font-size: 18px;
+  }
+
+  .bo {
+    display: inline-block;
+    margin-bottom: 8px;
+    padding: 4px 8px;
+    background: rgba(255,90,47,0.15);
+    color: #ff5a2f;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  .popup p {
+    margin: 8px 0 14px;
+    color: #ccc;
+    line-height: 1.5;
+    font-size: 14px;
+  }
+
+  .ddp-title {
+    font-size: 12px;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 0.08em;
+  }
+
+  .ddp {
+    border-top: 1px solid #333;
+    padding: 10px 0;
+    cursor: pointer;
+  }
+
+  .ddp strong {
+    color: #ff5a2f;
+    font-size: 13px;
+  }
+
+  .ddp span {
+    color: #ddd;
+    font-size: 13px;
+  }
+
+  .ddp-detail {
+    display: none;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.5;
+  }
+
+  .ddp.open .ddp-detail {
+    display: block;
+  }
+
+  .close-btn {
+    position: absolute;
+    right: 12px;
+    top: 10px;
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .close-btn:hover {
+    color: white;
+  }
+</style>
+</head>
+
+<body>
+
+<div class="wrapper">
+  <img src="flow.png" alt="Paramount Logistics Flow" />
+
+  <div class="hotspot" style="left: 2%; top: 12%; width: 10%; height: 15%;" data-id="interaction"></div>
+  <div class="hotspot" style="left: 15%; top: 16%; width: 6%; height: 10%;" data-id="start"></div>
+  <div class="hotspot" style="left: 22%; top: 14%; width: 8%; height: 12%;" data-id="contact"></div>
+  <div class="hotspot" style="left: 31%; top: 14%; width: 8%; height: 12%;" data-id="auto"></div>
+  <div class="hotspot" style="left: 40%; top: 14%; width: 8%; height: 12%;" data-id="appointment"></div>
+
+  <div class="hotspot" style="left: 38%; top: 35%; width: 8%; height: 12%;" data-id="manual"></div>
+  <div class="hotspot" style="left: 47%; top: 33%; width: 10%; height: 14%;" data-id="sps"></div>
+  <div class="hotspot" style="left: 63%; top: 32%; width: 10%; height: 14%;" data-id="reschedule"></div>
+  <div class="hotspot" style="left: 65%; top: 48%; width: 8%; height: 12%;" data-id="followup"></div>
+
+  <div class="hotspot" style="left: 50%; top: 52%; width: 10%; height: 14%;" data-id="delivery"></div>
+  <div class="hotspot" style="left: 50%; top: 68%; width: 8%; height: 10%;" data-id="delivered"></div>
+  <div class="hotspot" style="left: 50%; top: 80%; width: 8%; height: 10%;" data-id="visit"></div>
+  <div class="hotspot" style="left: 60%; top: 80%; width: 8%; height: 10%;" data-id="repair"></div>
+  <div class="hotspot" style="left: 70%; top: 80%; width: 8%; height: 10%;" data-id="consumption"></div>
+  <div class="hotspot" style="left: 68%; top: 65%; width: 8%; height: 10%;" data-id="missing"></div>
+  <div class="hotspot" style="left: 82%; top: 78%; width: 8%; height: 10%;" data-id="return"></div>
+  <div class="hotspot" style="left: 82%; top: 88%; width: 8%; height: 10%;" data-id="sendback"></div>
+  <div class="hotspot" style="left: 92%; top: 80%; width: 6%; height: 10%;" data-id="end"></div>
+</div>
+
+<div id="popup" class="popup"></div>
+
+<script>
+const flowData = {
+  interaction: {
+    bo: "IC",
+    title: "Interaction Center",
+    summary: "Customer request is received and the service process starts.",
+    ddps: []
+  },
+  start: {
+    bo: "Start",
+    title: "Start",
+    summary: "Beginning of the logistics and service flow.",
+    ddps: []
+  },
+  contact: {
+    bo: "BO 3.1",
+    title: "Customer Contact",
+    summary: "Customer contact is created and initial service needs are captured.",
+    ddps: []
+  },
+  auto: {
+    bo: "BO 3.1.2",
+    title: "Automatic Preprepping",
+    summary: "The system automatically identifies spare parts that may be needed for the work order.",
+    ddps: [
+      {
+        code: "DDP-58673",
+        name: "Prepping categorizations and status",
+        detail: "Defines part categories such as Mandatory, Planned and B2B and supports correct logistics triggering."
+      }
+    ]
+  },
+  appointment: {
+    bo: "Appointment",
+    title: "Appointment Scheduled",
+    summary: "The first appointment is scheduled based on customer and service availability.",
+    ddps: []
+  },
+  manual: {
+    bo: "BO 3.1.2",
+    title: "Manual Prepping",
+    summary: "Backoffice can manually prepare or adjust spare part requests when needed.",
+    ddps: [
+      {
+        code: "DDP-58673",
+        name: "Prepping categorizations and status",
+        detail: "Allows spare part requests to have clear categories and statuses so the correct SAP logistics process can be triggered."
+      },
+      {
+        code: "DDP-58674",
+        name: "Manual prepping logic",
+        detail: "Supports manual adjustment of spare part requests before reservation or delivery steps."
+      }
+    ]
+  },
+  sps: {
+    bo: "SPS",
+    title: "SPS - Spare Part Reservation",
+    summary: "Spare parts are checked and reserved before the delivery process continues.",
+    ddps: [
+      {
+        code: "DDP-60449",
+        name: "Spare Part Reservation",
+        detail: "Checks availability and reservation logic to support reliable spare part delivery."
+      }
+    ]
+  },
+  reschedule: {
+    bo: "Rescheduling",
+    title: "Appointment Rescheduling Required",
+    summary: "If the required parts or timing are not suitable, appointment rescheduling may be needed.",
+    ddps: []
+  },
+  followup: {
+    bo: "Follow-up",
+    title: "Follow-Up Appointment Scheduled",
+    summary: "A follow-up appointment is scheduled when the repair cannot be completed in the first visit.",
+    ddps: []
+  },
+  delivery: {
+    bo: "BO Logistics",
+    title: "Spare Part Delivery",
+    summary: "Reserved spare parts are prepared and delivered through the logistics process.",
+    ddps: [
+      {
+        code: "DDP-Delivery",
+        name: "Spare Part Delivery Tracking",
+        detail: "Tracks whether the requested spare parts are shipped, delivered and ready for technician use."
+      }
+    ]
+  },
+  delivered: {
+    bo: "Technician",
+    title: "Parts Delivered",
+    summary: "Parts reach the technician or technician stock before the customer visit.",
+    ddps: []
+  },
+  visit: {
+    bo: "Technician",
+    title: "Customer Visit",
+    summary: "Technician visits the customer and performs diagnosis or repair.",
+    ddps: []
+  },
+  repair: {
+    bo: "Repair",
+    title: "Repair",
+    summary: "Technician performs the repair using the available spare parts.",
+    ddps: []
+  },
+  consumption: {
+    bo: "Consumption",
+    title: "Consumption",
+    summary: "Used spare parts are consumed and reflected in the process.",
+    ddps: []
+  },
+  missing: {
+    bo: "Exception",
+    title: "Part Missing",
+    summary: "A required part is missing, which may trigger rescheduling or additional logistics steps.",
+    ddps: []
+  },
+  return: {
+    bo: "Return",
+    title: "Unused Return",
+    summary: "Unused spare parts are returned after the repair process.",
+    ddps: []
+  },
+  sendback: {
+    bo: "Return",
+    title: "Send Back to Factory",
+    summary: "Specific parts may be sent back to the factory depending on business rules.",
+    ddps: []
+  },
+  end: {
+    bo: "End",
+    title: "End",
+    summary: "The logistics and service process is completed.",
+    ddps: []
+  }
+};
+
+const popup = document.getElementById("popup");
+
+document.querySelectorAll(".hotspot").forEach(hotspot => {
+  hotspot.addEventListener("click", function(e) {
+    e.stopPropagation();
+
+    const id = this.dataset.id;
+    const data = flowData[id];
+
+    let ddpHtml = "";
+
+    if (data.ddps.length > 0) {
+      ddpHtml += `<div class="ddp-title">Related DDPs</div>`;
+
+      data.ddps.forEach(ddp => {
+        ddpHtml += `
+          <div class="ddp">
+            <strong>${ddp.code}</strong> - <span>${ddp.name}</span>
+            <div class="ddp-detail">${ddp.detail}</div>
+          </div>
+        `;
+      });
+    } else {
+      ddpHtml = `<div class="ddp-title">No DDP added yet</div>`;
+    }
+
+    popup.innerHTML = `
+      <button class="close-btn" onclick="closePopup()">×</button>
+      <div class="bo">${data.bo}</div>
+      <h3>${data.title}</h3>
+      <p>${data.summary}</p>
+      ${ddpHtml}
+    `;
+
+    popup.style.display = "block";
+
+    let x = e.clientX + 16;
+    let y = e.clientY + 16;
+
+    if (x + 340 > window.innerWidth) {
+      x = e.clientX - 360;
+    }
+
+    if (y + 300 > window.innerHeight) {
+      y = e.clientY - 260;
+    }
+
+    popup.style.left = x + "px";
+    popup.style.top = y + "px";
+  });
+});
+
+document.addEventListener("click", function(e) {
+  if (e.target.closest(".ddp")) {
+    e.target.closest(".ddp").classList.toggle("open");
+    return;
+  }
+
+  if (!e.target.closest(".popup")) {
+    closePopup();
+  }
+});
+
+function closePopup() {
+  popup.style.display = "none";
+}
+</script>
+
+</body>
+</html>
