@@ -6,11 +6,7 @@
 <title>Logistics Flow</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: Arial, sans-serif;
@@ -31,19 +27,9 @@
     z-index: 100;
   }
 
-  header h1 {
-    font-size: 16px;
-    letter-spacing: 2px;
-  }
-
-  header span {
-    color: #E84525;
-  }
-
-  .hint {
-    font-size: 12px;
-    color: #999;
-  }
+  header h1 { font-size: 16px; letter-spacing: 2px; }
+  header span { color: #E84525; }
+  .hint { font-size: 12px; color: #999; }
 
   .diagram-wrapper {
     position: relative;
@@ -70,16 +56,14 @@
     border-radius: 4px;
   }
 
-  .hotspot:hover,
-  .hotspot.active {
-    background: rgba(232, 69, 37, 0.16);
-    outline: 2px solid rgba(232, 69, 37, 0.75);
+  .hotspot:hover {
+    background: rgba(232, 69, 37, 0.12);
+    box-shadow: 0 0 0 2px rgba(232, 69, 37, 0.65);
   }
 
-  /* DEBUG MODE: hotspotları görmek için açık bırak, bitince kapat */
-  .hotspot {
-    border: 2px solid red;
-    background: rgba(255, 0, 0, 0.12);
+  .hotspot.active {
+    background: rgba(232, 69, 37, 0.20);
+    box-shadow: 0 0 0 2px #E84525;
   }
 
   #popup {
@@ -128,9 +112,9 @@
     cursor: pointer;
   }
 
-  .popup-body {
-    padding: 16px;
-  }
+  .close-btn:hover { color: #fff; }
+
+  .popup-body { padding: 16px; }
 
   .popup-summary {
     color: #ccc;
@@ -160,6 +144,10 @@
     display: flex;
     gap: 8px;
     align-items: center;
+  }
+
+  .ddp-header:hover {
+    background: rgba(255,255,255,0.04);
   }
 
   .ddp-code {
@@ -210,13 +198,13 @@
 
     <img src="flow.png" alt="Logistics Flow Diagram" />
 
-    <!-- HOTSPOTS: Buradaki left/top/width/height değerlerini sen ayarlayabilirsin -->
-
+    <!-- Interaction Center Lane -->
     <div class="hotspot" data-id="customer-contact" style="left:25.9%; top:11.3%; width:6.1%; height:9.4%;"></div>
     <div class="hotspot" data-id="automatic-prepping" style="left:33.6%; top:11.3%; width:6.4%; height:9.4%;"></div>
     <div class="hotspot" data-id="appointment-scheduled" style="left:41.0%; top:11.3%; width:6.2%; height:9.4%;"></div>
     <div class="hotspot" data-id="atp-check-ic" style="left:45.6%; top:7.8%; width:6.2%; height:3.0%;"></div>
 
+    <!-- Back Office Lane -->
     <div class="hotspot" data-id="manual-prepping" style="left:41.0%; top:25.9%; width:6.2%; height:9.4%;"></div>
     <div class="hotspot" data-id="atp-check-bo" style="left:45.8%; top:25.0%; width:6.2%; height:3.1%;"></div>
     <div class="hotspot" data-id="sps" style="left:53.4%; top:25.9%; width:6.2%; height:9.4%;"></div>
@@ -224,9 +212,11 @@
     <div class="hotspot" data-id="appointment-rescheduling" style="left:70.8%; top:26.0%; width:6.2%; height:9.3%;"></div>
     <div class="hotspot" data-id="follow-up-appointment" style="left:70.8%; top:40.0%; width:6.2%; height:9.2%;"></div>
 
+    <!-- Logistics Lane -->
     <div class="hotspot" data-id="spare-part-delivery" style="left:53.4%; top:54.0%; width:6.2%; height:9.0%;"></div>
     <div class="hotspot" data-id="escalation-logistics" style="left:58.2%; top:52.4%; width:6.2%; height:4.1%;"></div>
 
+    <!-- Technician Lane -->
     <div class="hotspot" data-id="parts-delivered" style="left:53.4%; top:71.3%; width:6.2%; height:9.5%;"></div>
     <div class="hotspot" data-id="part-missing" style="left:70.7%; top:71.3%; width:6.2%; height:9.5%;"></div>
     <div class="hotspot" data-id="customer-visit" style="left:53.4%; top:84.2%; width:6.2%; height:9.5%;"></div>
@@ -257,11 +247,6 @@
 </div>
 
 <script>
-/*
-  DDP içeriklerini sadece buradan güncelle.
-  Her kutunun data-id değeri ile aşağıdaki key aynı olmalı.
-*/
-
 const flowData = {
   "customer-contact": {
     bo: "BO CODE HERE",
@@ -525,6 +510,12 @@ overlay.addEventListener("click", closePopup);
 
 document.addEventListener("keydown", e => {
   if (e.key === "Escape") closePopup();
+});
+
+window.addEventListener("resize", () => {
+  if (activeHotspot) {
+    positionPopup(activeHotspot);
+  }
 });
 </script>
 
