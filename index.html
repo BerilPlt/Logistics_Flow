@@ -23,9 +23,9 @@ header{background:#111;height:var(--header-h);display:flex;align-items:center;ju
 .diagram-container{position:relative;display:inline-block;width:100%}
 .diagram-container img{display:block;width:100%;height:auto;border-radius:8px;box-shadow:0 2px 16px rgba(0,0,0,.08)}
 .hs{position:absolute;cursor:pointer;border-radius:3px}
-.hs::after{content:'';position:absolute;top:6%;right:6%;width:9px;height:9px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2px #fff;opacity:.8;transition:transform .15s,opacity .15s,box-shadow .15s;pointer-events:none}
-.hs:hover::after{transform:scale(1.3);opacity:1}
-.hs.active::after{transform:scale(1.2);opacity:1;box-shadow:0 0 0 2px #fff,0 0 0 4px var(--red)}
+.dot{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--red);box-shadow:0 0 0 2.5px #fff;pointer-events:none;transform:translate(-50%,-50%);opacity:0;transition:opacity .15s,transform .15s;z-index:150}
+.dot.visible{opacity:1}
+.dot.active{opacity:1;box-shadow:0 0 0 2.5px #fff,0 0 0 5px var(--red);transform:translate(-50%,-50%) scale(1.2)}
 .side-panel{width:0;flex-shrink:0;background:var(--panel-bg);border-left:1px solid var(--border);overflow:hidden;transition:width var(--ease);display:flex;flex-direction:column}
 .side-panel.open{width:var(--panel-w)}
 .panel-inner{width:var(--panel-w);height:100%;display:flex;flex-direction:column;overflow:hidden}
@@ -127,6 +127,37 @@ const flowData={
   "send-back-factory":{bo:"BO-04",title:"Send Back to Factory",summary:"Faulty or defective parts removed from the customer asset are returned to the factory or repair depot for analysis, remanufacturing, or warranty claim processing.",ddps:[{code:"DDP-046",name:"Defect Tagging",detail:"The technician tags the returned part with a fault description and symptom code. Used by the factory for root-cause analysis."},{code:"DDP-047",name:"Warranty Claim Linkage",detail:"If the part is under manufacturer warranty, a claim is automatically opened against the supplier when the return is scanned at the factory."}]}
 };
 
+// ── Dot element ──
+const dot = document.createElement('div');
+dot.className = 'dot';
+document.body.appendChild(dot);
+
+function moveDot(hs) {
+  const r = hs.getBoundingClientRect();
+  dot.style.left = (r.left + r.width  / 2) + 'px';
+  dot.style.top  = (r.top  + r.height / 2) + 'px';
+}
+
+document.querySelectorAll('.hs').forEach(hs => {
+  hs.addEventListener('mouseenter', () => {
+    if (hs === activeHs) return; // active dot handles itself
+    moveDot(hs);
+    dot.classList.remove('active');
+    dot.classList.add('visible');
+  });
+  hs.addEventListener('mouseleave', () => {
+    if (hs === activeHs) return;
+    dot.classList.remove('visible');
+  });
+});
+
+// Update dot on scroll/resize so it stays on the active hotspot
+function syncActiveDot() {
+  if (activeHs) moveDot(activeHs);
+}
+document.querySelector('.diagram-area').addEventListener('scroll', syncActiveDot);
+window.addEventListener('resize', syncActiveDot);
+
 const panel=document.getElementById('sidePanel'),inner=document.getElementById('panelInner'),closeBtn=document.getElementById('panelClose');
 let activeHs=null;
 
@@ -137,9 +168,12 @@ document.querySelectorAll('.hs').forEach(hs=>{
     if(!d)return;
     const same=hs===activeHs;
     if(activeHs)activeHs.classList.remove('active');
-    if(same){activeHs=null;closePanel();return;}
+    if(same){activeHs=null;dot.classList.remove('active','visible');closePanel();return;}
     activeHs=hs;
     hs.classList.add('active');
+    moveDot(hs);
+    dot.classList.remove('visible');
+    dot.classList.add('active');
     renderPanel(d);
     panel.classList.add('open');
     inner.classList.add('anim');
@@ -163,9 +197,12 @@ function renderPanel(d){
   document.querySelector('.panel-body').scrollTop=0;
 }
 
-function closePanel(){panel.classList.remove('open');}
-closeBtn.addEventListener('click',()=>{if(activeHs){activeHs.classList.remove('active');activeHs=null;}closePanel();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(activeHs){activeHs.classList.remove('active');activeHs=null;}closePanel();}});
+function closePanel(){
+  panel.classList.remove('open');
+  dot.classList.remove('active');
+}
+closeBtn.addEventListener('click',()=>{if(activeHs){activeHs.classList.remove('active');activeHs=null;dot.classList.remove('active','visible');}closePanel();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(activeHs){activeHs.classList.remove('active');activeHs=null;dot.classList.remove('active','visible');}closePanel();}});
 </script>
 </body>
 </html>
